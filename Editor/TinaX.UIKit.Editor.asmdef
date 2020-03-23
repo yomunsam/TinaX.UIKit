@@ -1,0 +1,21 @@
+{
+    "name": "TinaX.UIKit.Editor",
+    "references": [
+        "GUID:2b2b84db2356fe84d9158fa418cdac5e",
+        "GUID:9db5e326baf15604fb41b0ba171e2039",
+        "GUID:8048103bccb874b46902aea4e95cc74e",
+        "GUID:4e58fd8b44ff4c14f917ce28647bad94",
+        "GUID:eb0b36a1eab17c54a93dfa5bf816d363"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

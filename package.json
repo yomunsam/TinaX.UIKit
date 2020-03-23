@@ -1,0 +1,23 @@
+{
+  "name": "io.nekonya.tinax.uikit",
+  "version": "6.6.0-preview",
+  "displayName": "TinaX.UIKit",
+  "description": "UGUI-based UI framework",
+  "unity": "2019.3",
+  "keywords": [
+    "TinaX",
+    "TinaX Framework",
+    "MonoBehaviour",
+    "XBehaviour",
+    "XComponent"
+  ],
+  "author": {
+    "name": "yomunsam",
+    "email": "yomunsam@gmail.com",
+    "url": "https://yomunchan.moe"
+  },
+  "type": "library",
+  "dependencies": {
+    
+  }
+}
