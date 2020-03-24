@@ -17,6 +17,7 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
     {
         private static bool mDataRefreshed = false;
         private static UIConfig mConfig;
+        private static SerializedObject mConfig_SerObj;
 
         [SettingsProvider]
         public static SettingsProvider XRuntimeSetting()
@@ -97,8 +98,19 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
                         EditorGUILayout.EndHorizontal();
 #endif
 
+
+                        GUILayout.Space(20);
+                        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                        var ui_img_folder = mConfig_SerObj.FindProperty("UI_Image_Folders");
+                        EditorGUILayout.PropertyField(ui_img_folder);
+
                     }
                     EditorGUILayout.EndVertical();
+
+                    if (mConfig_SerObj.hasModifiedProperties)
+                        mConfig_SerObj.ApplyModifiedProperties();
+                    else
+                        mConfig_SerObj.Update();
                 },
                 deactivateHandler = () =>
                 {
@@ -107,6 +119,8 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
                         EditorUtility.SetDirty(mConfig);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
+
+                        TinaXEditor.UIKit.Internal.ImportHandler.RefreshConfig();
                     }
                 },
             };
@@ -115,7 +129,7 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
         private static void refreshData()
         {
             mConfig = XConfig.GetConfig<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources, false);
-
+            mConfig_SerObj = new SerializedObject(mConfig);
 
 
             mDataRefreshed = true;

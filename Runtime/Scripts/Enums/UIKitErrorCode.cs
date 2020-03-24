@@ -12,5 +12,6 @@ namespace TinaX.UIKit
         InvalidUIPage           = 1,
         InvalidUIName           = 2,
         ConnotGetUIPath         = 3,
+        InvalidXBehaviourType   = 4,
     }
 }

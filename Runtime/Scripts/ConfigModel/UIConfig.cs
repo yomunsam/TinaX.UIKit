@@ -25,5 +25,16 @@ namespace TinaX.UIKit.Internal
 
         public bool AutoCreateEventSystem = true;
 
+        public Color DefaultUIMaskColor = Color.black;
+
+        public List<UIFolderItem> UI_Image_Folders;
+
+        [System.Serializable]
+        public struct UIFolderItem
+        {
+            public string Path;
+            public bool Atlas;
+        }
+
     }
 }
