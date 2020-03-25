@@ -27,7 +27,7 @@ namespace TinaX.UIKit.Entity
             {
                 _uiPage = value;
                 if (value != null)
-                    _uiPage.OnDestroy = OnUIDestory;
+                    _uiPage.OnPageDestroy = OnUIDestory;
             }
         }
         public GameObject UIGameObject;
@@ -129,7 +129,7 @@ namespace TinaX.UIKit.Entity
             UIStatue = UIStatus.Unloaded;
             if (UIGameObject != null)
             {
-                UIGameObject.Destroy();
+                UIGameObject.Destroy(this.UIPage.DestroyDelayTime);
                 UIGameObject = null;
             }
             UICanvas = null;
