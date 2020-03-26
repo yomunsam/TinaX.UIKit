@@ -15,17 +15,20 @@ namespace TinaXEditor.UIKit.Animation
         SerializedProperty _fromValue;
         SerializedProperty _toValue;
         SerializedProperty _ease;
-        protected override void OnEnable()
+
+        private bool _refresh_data = false;
+        private void _refreshData()
         {
-            base.OnEnable();
             _fromValue = this.serializedObject.FindProperty("FromValue");
             _toValue = this.serializedObject.FindProperty("ToValue");
             _ease = this.serializedObject.FindProperty("Ease");
-
+            _refresh_data = true;
         }
 
         public override void OnInspectorGUI()
         {
+            if (!_refresh_data)
+                _refreshData();
             EditorGUILayout.PropertyField(_fromValue);
             EditorGUILayout.PropertyField(_toValue);
             EditorGUILayout.BeginHorizontal();

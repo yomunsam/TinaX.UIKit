@@ -462,6 +462,7 @@ namespace TinaX.UIKit
             if (entity.UIGameObject == null)
             {
                 var prefab = await Assets.LoadAsync<GameObject>(entity.UIPath);
+                entity.UIPrefab = prefab;
                 var uiPage = prefab.GetComponent<UIPage>();
                 if (uiPage == null)
                 {
@@ -475,7 +476,7 @@ namespace TinaX.UIKit
                     if (!SortingLayer.IsValid(uiPage.SortingLayerID))
                         uiPage.SortingLayerID = 0;
                     Transform trans_uiroot = getScreenUIRoot(uiPage.SortingLayerID);
-                    entity.UIGameObject = UnityEngine.Object.Instantiate(prefab, trans_uiroot);
+                    entity.UIGameObject = UnityEngine.GameObject.Instantiate(prefab, trans_uiroot);
                     if (entity.UIGameObject.name.Length > 7)
                         entity.UIGameObject.Name(entity.UIGameObject.name.Substring(0, entity.UIGameObject.name.Length - 7));
 
@@ -483,11 +484,10 @@ namespace TinaX.UIKit
                 else
                 {
                     //非ScreenUI, 在指定的UIRoot下创建GameObject
-                    entity.UIGameObject = UnityEngine.Object.Instantiate(prefab, _ui_root);
+                    entity.UIGameObject = UnityEngine.GameObject.Instantiate(prefab, _ui_root);
                     if (entity.UIGameObject.name.Length > 7)
                         entity.UIGameObject.Name(entity.UIGameObject.name.Substring(0, entity.UIGameObject.name.Length - 7));
                 }
-                Assets.Release(prefab);
             }
 
             entity.UIPage = entity.UIGameObject.GetComponent<UIPage>();

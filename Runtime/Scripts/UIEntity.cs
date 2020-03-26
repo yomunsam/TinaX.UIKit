@@ -32,6 +32,8 @@ namespace TinaX.UIKit.Entity
         }
         public GameObject UIGameObject;
 
+        public GameObject UIPrefab;
+
         public Canvas UICanvas;
         public int SortingOrder
         {
@@ -131,6 +133,14 @@ namespace TinaX.UIKit.Entity
             {
                 UIGameObject.Destroy(this.UIPage.DestroyDelayTime);
                 UIGameObject = null;
+            }
+            if(UIPrefab != null)
+            {
+                if(XCore.GetMainInstance().TryGetBuiltinService<TinaX.Services.IAssetService>(out var assets))
+                {
+                    assets.Release(UIPrefab);
+                }
+                UIPrefab = null;
             }
             UICanvas = null;
             UIPage = null;

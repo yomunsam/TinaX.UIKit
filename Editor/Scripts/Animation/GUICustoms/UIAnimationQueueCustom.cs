@@ -20,10 +20,28 @@ namespace TinaXEditor.UIKit.Animation
         SerializedProperty _onFinish;
 
         ReorderableList _list_queues;
+        private bool _refresh_data = false;
 
-        protected override void OnEnable()
+
+        public override void OnInspectorGUI()
         {
-            base.OnEnable();
+            if (!_refresh_data)
+                _refreshData();
+            EditorGUILayout.Space();
+            _list_queues.DoLayoutList();
+
+            GUILayout.Space(10);
+            EditorGUILayout.PropertyField(_title);
+            EditorGUILayout.PropertyField(_playOnAwake);
+
+            GUILayout.Space(10);
+            EditorGUILayout.PropertyField(_onFinish);
+
+            this.serializedObject.ApplyModifiedProperties();
+        }
+
+        private void _refreshData()
+        {
             _queues = this.serializedObject.FindProperty("Queues");
 
             _playOnAwake = this.serializedObject.FindProperty("playOnAwake");
@@ -38,9 +56,9 @@ namespace TinaXEditor.UIKit.Animation
                 SerializedProperty itemData = _queues.GetArrayElementAtIndex(index);
                 SerializedProperty itemData_Anis = itemData.FindPropertyRelative("UI_Anis");
                 SerializedProperty itemData_Delay = itemData.FindPropertyRelative("DelayAfter");
-                if(itemData_Anis.arraySize > 0)
+                if (itemData_Anis.arraySize > 0)
                 {
-                    for(var i = 0; i < itemData_Anis.arraySize; i++)
+                    for (var i = 0; i < itemData_Anis.arraySize; i++)
                     {
                         var rect_item = rect;
                         rect_item.y += i * (EditorGUIUtility.singleLineHeight + 2);
@@ -60,7 +78,7 @@ namespace TinaXEditor.UIKit.Animation
                         var rect_del = rect_item;
                         rect_del.x += rect_obj.width + 4 + rect_ready.width + 2;
                         rect_del.width = 19;
-                        if(GUI.Button(rect_del, new GUIContent("×", "Delete")))
+                        if (GUI.Button(rect_del, new GUIContent("×", "Delete")))
                         {
                             itemData_Anis.DeleteArrayElementAtIndex(i);
                         }
@@ -110,21 +128,8 @@ namespace TinaXEditor.UIKit.Animation
             {
                 EditorGUI.LabelField(rect, "UI Animation Queue");
             };
+            _refresh_data = true;
         }
 
-        public override void OnInspectorGUI()
-        {
-            EditorGUILayout.Space();
-            _list_queues.DoLayoutList();
-
-            GUILayout.Space(10);
-            EditorGUILayout.PropertyField(_title);
-            EditorGUILayout.PropertyField(_playOnAwake);
-
-            GUILayout.Space(10);
-            EditorGUILayout.PropertyField(_onFinish);
-
-            this.serializedObject.ApplyModifiedProperties();
-        }
     }
 }

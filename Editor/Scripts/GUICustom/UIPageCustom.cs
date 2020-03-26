@@ -14,13 +14,12 @@ namespace TinaXEditor.UIKit
     {
         private UIPage _target;
 
-        private void OnEnable()
-        {
-            _target = (UIPage)target;
-        }
+        
 
         public override void OnInspectorGUI()
         {
+            if (_target == null)
+                _target = (UIPage)target;
             EditorGUILayout.BeginVertical();
 
             //处理者
