@@ -3,50 +3,53 @@ using UnityEngine;
 
 namespace TinaX.UIKit.Animation
 {
-
-    [AddComponentMenu("TinaX/UIKit/Animation/Transform Scale")]
-    public class TransformScaleAni : UIAnimationBase
+    [RequireComponent(typeof(RectTransform))]
+    [AddComponentMenu("TinaX/UIKit/Animation/RectTransform/AnchoredPosition Ani")]
+    public class RectTransformAnchoredPositionAni : UIAnimationBase
     {
-        public Transform AniTarget;
         public bool AutoOriginValue = false;
-        public Vector3 FromValue = Vector3.zero;
+        public Vector2 FromValue;
         public bool AutoTargetValue = false;
-        public Vector3 ToValue = Vector3.one;
+        public Vector2 ToValue = Vector2.one;
 
         public Tween.EaseType Ease;
 
-
         private System.IDisposable _disposable;
         private bool pingpong_switch;
+        private RectTransform _rectTransform;
 
-        Vector3? origin_value;
-        Vector3? target_value;
+        private Vector2? origin_value;
+        private Vector2? target_value;
 
         public override void Ready()
         {
-            if (AniTarget == null) AniTarget = this.transform;
+            if (_rectTransform == null) _rectTransform = this.GetComponent<RectTransform>();
+            if (origin_value == null)
+                origin_value = this.AutoOriginValue ? this._rectTransform.anchoredPosition : this.FromValue;
+            if (target_value == null)
+                target_value = this.AutoTargetValue ? this._rectTransform.anchoredPosition : this.ToValue;
 
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
-
-            AniTarget.localScale = this.FromValue;
+            _rectTransform.anchoredPosition = FromValue;
         }
 
         public override void Play()
         {
-            if (AniTarget == null) AniTarget = this.transform;
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
+            if (_rectTransform == null) _rectTransform = this.GetComponent<RectTransform>();
+
+            if (origin_value == null)
+                origin_value = this.AutoOriginValue ? this._rectTransform.anchoredPosition : this.FromValue;
+            if (target_value == null)
+                target_value = this.AutoTargetValue ? this._rectTransform.anchoredPosition : this.ToValue;
 
             if (!AutoOriginValue)
-                this.AniTarget.localScale = this.FromValue;
+                this._rectTransform.anchoredPosition = this.FromValue;
             else
             {
                 this.pingPong = false;
                 this.AutoTargetValue = false;
             }
 
-            if (origin_value.Value == target_value.Value)
+            if(origin_value.Value == target_value.Value)
             {
                 this.AniFinish();
                 return;
@@ -59,6 +62,7 @@ namespace TinaX.UIKit.Animation
                 .Subscribe(doNext, finish);
         }
 
+
         public override void Stop()
         {
             _disposable?.Dispose();
@@ -67,10 +71,10 @@ namespace TinaX.UIKit.Animation
             base.Stop();
         }
 
-        private void doNext(Vector3 value)
+        private void doNext(Vector2 value)
         {
-            if (this.AniTarget != null)
-                this.AniTarget.localScale = value;
+            if (this._rectTransform != null)
+                this._rectTransform.anchoredPosition = value;
         }
 
         private void finish()
@@ -90,6 +94,8 @@ namespace TinaX.UIKit.Animation
                 this.AniFinish();
             }
         }
+
+
 
     }
 }

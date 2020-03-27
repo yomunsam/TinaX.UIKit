@@ -23,7 +23,7 @@ namespace TinaXEditor.UIKit.Animation
 
         public override void OnInspectorGUI()
         {
-            if (!refresh_data)
+            if (!refresh_data || _title == null)
                 refreshData();
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(_title, true);

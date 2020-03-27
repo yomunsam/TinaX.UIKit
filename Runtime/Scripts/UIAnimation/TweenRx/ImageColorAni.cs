@@ -1,17 +1,19 @@
-﻿using UniRx;
+﻿using System.Collections;
+using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
+using TinaX;
 
 namespace TinaX.UIKit.Animation
 {
-
-    [AddComponentMenu("TinaX/UIKit/Animation/Transform Scale")]
-    public class TransformScaleAni : UIAnimationBase
+    [AddComponentMenu("TinaX/UIKit/Animation/Image/Image Color")]
+    public class ImageColorAni : UIAnimationBase
     {
-        public Transform AniTarget;
+        public Image AniTarget;
         public bool AutoOriginValue = false;
-        public Vector3 FromValue = Vector3.zero;
+        public Color FromValue;
         public bool AutoTargetValue = false;
-        public Vector3 ToValue = Vector3.one;
+        public Color ToValue;
 
         public Tween.EaseType Ease;
 
@@ -19,27 +21,26 @@ namespace TinaX.UIKit.Animation
         private System.IDisposable _disposable;
         private bool pingpong_switch;
 
-        Vector3? origin_value;
-        Vector3? target_value;
+        Color? origin_value;
+        Color? target_value;
 
         public override void Ready()
         {
-            if (AniTarget == null) AniTarget = this.transform;
+            if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
+            origin_value = this.AutoOriginValue ? this.AniTarget.color : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.color : this.ToValue;
 
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
-
-            AniTarget.localScale = this.FromValue;
+            AniTarget.color = FromValue;
         }
 
         public override void Play()
         {
-            if (AniTarget == null) AniTarget = this.transform;
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
+            if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
+            origin_value = this.AutoOriginValue ? this.AniTarget.color : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.color : this.ToValue;
 
             if (!AutoOriginValue)
-                this.AniTarget.localScale = this.FromValue;
+                this.AniTarget.color = this.FromValue;
             else
             {
                 this.pingPong = false;
@@ -59,18 +60,18 @@ namespace TinaX.UIKit.Animation
                 .Subscribe(doNext, finish);
         }
 
+
         public override void Stop()
         {
             _disposable?.Dispose();
             _disposable = null;
             pingpong_switch = false;
-            base.Stop();
         }
 
-        private void doNext(Vector3 value)
+        private void doNext(Color value)
         {
             if (this.AniTarget != null)
-                this.AniTarget.localScale = value;
+                this.AniTarget.color = value;
         }
 
         private void finish()
@@ -90,6 +91,7 @@ namespace TinaX.UIKit.Animation
                 this.AniFinish();
             }
         }
+
 
     }
 }

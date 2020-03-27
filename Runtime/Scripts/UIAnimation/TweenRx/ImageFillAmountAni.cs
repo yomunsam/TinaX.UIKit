@@ -1,45 +1,51 @@
-﻿using UniRx;
+﻿using System.Collections;
+using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TinaX.UIKit.Animation
 {
-
-    [AddComponentMenu("TinaX/UIKit/Animation/Transform Scale")]
-    public class TransformScaleAni : UIAnimationBase
+    [RequireComponent(typeof(Image))]
+    [AddComponentMenu("TinaX/UIKit/Animation/Image/Image Fill Amount")]
+    public class ImageFillAmountAni : UIAnimationBase
     {
-        public Transform AniTarget;
         public bool AutoOriginValue = false;
-        public Vector3 FromValue = Vector3.zero;
+        [Range(0,1)]
+        public float FromValue = 0;
         public bool AutoTargetValue = false;
-        public Vector3 ToValue = Vector3.one;
+        [Range(0,1)]
+        public float ToValue = 1;
 
         public Tween.EaseType Ease;
 
 
         private System.IDisposable _disposable;
         private bool pingpong_switch;
+        private Image _image;
 
-        Vector3? origin_value;
-        Vector3? target_value;
+        float? origin_value;
+        float? target_value;
 
         public override void Ready()
         {
-            if (AniTarget == null) AniTarget = this.transform;
+            if (_image == null) _image = this.GetComponent<Image>();
+            if (origin_value == null)
+                origin_value = this.AutoOriginValue ? this._image.fillAmount : this.FromValue;
+            if (target_value == null)
+                target_value = this.AutoTargetValue ? this._image.fillAmount : this.ToValue;
 
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
-
-            AniTarget.localScale = this.FromValue;
+            _image.fillAmount = FromValue;
         }
-
         public override void Play()
         {
-            if (AniTarget == null) AniTarget = this.transform;
-            origin_value = this.AutoOriginValue ? this.AniTarget.localScale : this.FromValue;
-            target_value = this.AutoTargetValue ? this.AniTarget.localScale : this.ToValue;
+            if (_image == null) _image = this.GetComponent<Image>();
+            if (origin_value == null)
+                origin_value = this.AutoOriginValue ? this._image.fillAmount : this.FromValue;
+            if (target_value == null)
+                target_value = this.AutoTargetValue ? this._image.fillAmount : this.ToValue;
 
             if (!AutoOriginValue)
-                this.AniTarget.localScale = this.FromValue;
+                this._image.fillAmount = this.FromValue;
             else
             {
                 this.pingPong = false;
@@ -59,6 +65,7 @@ namespace TinaX.UIKit.Animation
                 .Subscribe(doNext, finish);
         }
 
+
         public override void Stop()
         {
             _disposable?.Dispose();
@@ -67,10 +74,10 @@ namespace TinaX.UIKit.Animation
             base.Stop();
         }
 
-        private void doNext(Vector3 value)
+        private void doNext(float value)
         {
-            if (this.AniTarget != null)
-                this.AniTarget.localScale = value;
+            if (this._image != null)
+                this._image.fillAmount = value;
         }
 
         private void finish()
@@ -90,6 +97,7 @@ namespace TinaX.UIKit.Animation
                 this.AniFinish();
             }
         }
+
 
     }
 }

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
 namespace TinaX.UIKit.Animation
 {
-    [AddComponentMenu("TinaX/UIKit/Animation/Queue")]
+    [AddComponentMenu("TinaX/UIKit/Animation/Ani Queue")]
     public class UIAnimationQueue : UIAnimationBase
     {
         public List<QueueItem> Queues;
@@ -30,14 +27,47 @@ namespace TinaX.UIKit.Animation
         private int index = 0;
         private bool play_flag = false;
 
-        public override void Play()
+        public override void Ready()
         {
+            if (this.Queues == null || this.Queues.Count == 0)
+                return;
             //检查死循环
             if (checkLoopRecursive(this))
                 return;
+            //Ready
+            foreach (var item in this.Queues)
+            {
+                if (item.UI_Anis != null && item.UI_Anis.Length > 0)
+                {
+                    foreach (var i2 in item.UI_Anis)
+                    {
+                        if (i2.ReadyOnQueueStart && i2.UI_Ani != null)
+                            i2.UI_Ani.Ready();
+                    }
+                }
+            }
+            base.Ready();
+        }
 
-            if (this.Queues == null || this.Queues.Count == 0) 
+        public override void Play()
+        {
+            if (this.Queues == null || this.Queues.Count == 0)
                 return;
+            //检查死循环
+            if (checkLoopRecursive(this))
+                return;
+            //Ready
+            foreach(var item in this.Queues)
+            {
+                if(item.UI_Anis != null && item.UI_Anis.Length > 0)
+                {
+                    foreach(var i2 in item.UI_Anis)
+                    {
+                        if (i2.ReadyOnQueueStart && i2.UI_Ani != null)
+                            i2.UI_Ani.Ready();
+                    }
+                }
+            }
 
             play_flag = true;
             doPlay();
@@ -83,10 +113,10 @@ namespace TinaX.UIKit.Animation
                 void __finish()
                 {
                     counter++;
-                    Debug.Log("收到finish" + counter);
+                    //Debug.Log("收到finish" + counter);
                     if (counter == _play_counter)
                     {
-                        Debug.Log("队列中的当前index都finish了：" + index);
+                        //Debug.Log("队列中的当前index都finish了：" + index);
                         foreach (var item in Queues[index].UI_Anis)
                         {
                             if (item.UI_Ani == null) continue;
@@ -116,19 +146,19 @@ namespace TinaX.UIKit.Animation
             {
                 return;
             }
-            Debug.Log("finish尝试等待并继续执行下一队列，index:" + index);
+            //Debug.Log("finish尝试等待并继续执行下一队列，index:" + index);
             //等待并继续开始
             Observable
                 .NextFrame()
                 .Delay(TimeSpan.FromSeconds(this.Queues[index].DelayAfter))
                 .Subscribe(_ =>
                 {
-                    Debug.Log("finish的等待结束了, index "+ index);
+                    //Debug.Log("finish的等待结束了, index "+ index);
                     if (!play_flag) return;
                     index++;
                     if(index >= this.Queues.Count)
                     {
-                        Debug.Log("到此，队列结束");
+                        //Debug.Log("到此，队列结束");
                         //队列结束
                         play_flag = false;
                         this.AniFinish();

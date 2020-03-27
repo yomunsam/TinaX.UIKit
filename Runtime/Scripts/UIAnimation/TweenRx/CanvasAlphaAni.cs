@@ -7,6 +7,7 @@ namespace TinaX.UIKit.Animation
     [RequireComponent(typeof(CanvasGroup))]
     public class CanvasAlphaAni : UIAnimationBase
     {
+        public bool AutoOriginValue = false;
         [Range(0,1)]
         public float FromAlpha = 0;
         [Range(0, 1)]
@@ -31,10 +32,18 @@ namespace TinaX.UIKit.Animation
         {
             if(_canvasGroup == null) { _canvasGroup = this.gameObject.GetComponent<CanvasGroup>(); }
 
-            _canvasGroup.alpha = FromAlpha;
-
-            _disposable = Tween.Play(FromAlpha, ToAlpha, this.Duration, this.Ease)
-                .Subscribe(OnNext, OnCompleted);
+            if (!AutoOriginValue)
+            {
+                _canvasGroup.alpha = FromAlpha;
+                _disposable = Tween.Play(FromAlpha, ToAlpha, this.Duration, this.Ease)
+                    .Subscribe(OnNext, OnCompleted);
+            }
+            else
+            {
+                _disposable = Tween.Play(this._canvasGroup.alpha, ToAlpha, this.Duration, this.Ease)
+                    .Subscribe(OnNext, OnCompleted);
+            }
+            
 
             base.Play();
         }

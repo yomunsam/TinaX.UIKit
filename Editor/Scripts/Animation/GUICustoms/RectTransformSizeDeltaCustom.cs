@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace TinaXEditor.UIKit.Animation
 {
-    [CustomEditor(typeof(TransformScaleAni),true)]
-    public class TransformScaleAniCustom : UIAnimationBaseCustom
+    [CustomEditor(typeof(RectTransformSizeDeltaAni),true)]
+    public class RectTransformSizeDeltaCustom : UIAnimationBaseCustom
     {
         SerializedProperty _aniTarget;
         SerializedProperty _autoOrigin;
@@ -33,50 +33,54 @@ namespace TinaXEditor.UIKit.Animation
             _refresh_data = true;
         }
 
-        private TransformScaleAni _target;
         
         public override void OnInspectorGUI()
         {
-            if (!_refresh_data || _fromValue == null)
-                _refreshData();
-            if (_target == null) _target = (TransformScaleAni)target;
-
             if (!_refresh_data || _fromValue == null)
                 _refreshData();
             EditorGUILayout.PropertyField(_aniTarget, new GUIContent("Animation Target", "The object that this animation acts on, if not specified, it defaults to the current Transform"));
 
             EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation start, the current actual value is used as \"From Value\""));
             EditorGUILayout.PropertyField(_autoTarget, new GUIContent("Auto Target", "If true, When the animation start, the current actual value is used as \"To Value\""));
-            if (!_target.AutoOriginValue)
+
+            if (!_autoOrigin.boolValue)
+            {
                 EditorGUILayout.PropertyField(_fromValue);
-            if (!_target.AutoTargetValue)
+            }
+
+            if (!_autoTarget.boolValue)
+            {
                 EditorGUILayout.PropertyField(_toValue);
+            }
 
             if (_autoOrigin.boolValue && _autoTarget.boolValue)
             {
                 EditorUtility.DisplayDialog("Error", "You cannot enable both \"Auto Origin\" and \"Auto Target\"", "Okey");
                 _autoTarget.boolValue = false;
-            }
+            }    
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Set current value as",GUILayout.MaxWidth(140));
-            if (GUILayout.Button("Origin",GUILayout.MaxWidth(50)))
+            if (!_autoOrigin.boolValue)
             {
-                if (_target.AniTarget == null)
+                if (GUILayout.Button("Origin", GUILayout.MaxWidth(50)))
                 {
-                    _target.AniTarget = _target.transform;
-                    this.serializedObject.Update();
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((RectTransformSizeDeltaAni)target).GetComponent<RectTransform>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _fromValue.vector2Value = ((RectTransform)_aniTarget.objectReferenceValue).sizeDelta;
                 }
-                _fromValue.vector3Value = _target.AniTarget.localScale;
             }
-            if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
+                
+            if (!_autoTarget.boolValue)
             {
-                if (_target.AniTarget == null)
+                if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
                 {
-                    _target.AniTarget = _target.transform;
-                    this.serializedObject.Update();
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((RectTransformSizeDeltaAni)target).GetComponent<RectTransform>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _toValue.vector2Value = ((RectTransform)_aniTarget.objectReferenceValue).sizeDelta;
                 }
-                _toValue.vector3Value = _target.AniTarget.localScale;
             }
             EditorGUILayout.EndHorizontal();
             GUILayout.Space(5);
