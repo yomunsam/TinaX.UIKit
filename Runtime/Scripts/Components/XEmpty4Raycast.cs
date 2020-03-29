@@ -8,6 +8,7 @@ using UnityEditor;
 
 namespace TinaX.UIKit
 {
+    [AddComponentMenu("TinaX/UIKit/Components/X Empty4Raycast")]
     public class XEmpty4Raycast : MaskableGraphic
     {
         protected XEmpty4Raycast()
@@ -22,7 +23,8 @@ namespace TinaX.UIKit
 
 
 #if UNITY_EDITOR
-        [MenuItem("GameObject/UI/xEmpty4Raycast", false, 12)]
+        [MenuItem("GameObject/UI/TinaX/xEmpty4Raycast", false, 1)]
+        [MenuItem("GameObject/TinaX/UIKit/xEmpty4Raycast", false, 1)]
         static void AddxE4R()
         {
             if (Selection.activeTransform != null)
@@ -50,6 +52,10 @@ namespace TinaX.UIKit
 
                     
                     Selection.activeTransform = go.transform;
+                }
+                else
+                {
+                    Debug.LogError("Component \"XEmpty4Raycast\" only can used in UGUI gameobject.");
                 }
                 
             }

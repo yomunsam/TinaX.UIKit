@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
+﻿using TinaX;
 using TinaX.UIKit.Animation;
+using UnityEditor;
 using UnityEngine;
 
 namespace TinaXEditor.UIKit.Animation
@@ -12,9 +8,11 @@ namespace TinaXEditor.UIKit.Animation
     [CustomEditor(typeof(CanvasAlphaAni),true)]
     public class CanvasAlphaAniCustom : UIAnimationBaseCustom
     {
+        SerializedProperty _aniTarget;
         SerializedProperty _autoOrigin;
-        SerializedProperty _fromAlpha;
-        SerializedProperty _toAlpha;
+        SerializedProperty _autoTarget;
+        SerializedProperty _fromValue;
+        SerializedProperty _toValue;
         SerializedProperty _ease;
 
         private bool _refresh_data = false;
@@ -22,23 +20,63 @@ namespace TinaXEditor.UIKit.Animation
         private void _refreshData()
         {
 
+            _aniTarget = this.serializedObject.FindProperty("AniTarget");
             _autoOrigin = this.serializedObject.FindProperty("AutoOriginValue");
-            _fromAlpha = this.serializedObject.FindProperty("FromAlpha");
-            _toAlpha = this.serializedObject.FindProperty("ToAlpha");
+            _autoTarget = this.serializedObject.FindProperty("AutoTargetValue");
+            _fromValue = this.serializedObject.FindProperty("FromValue");
+            _toValue = this.serializedObject.FindProperty("ToValue");
             _ease = this.serializedObject.FindProperty("Ease");
-
             _refresh_data = true;
         }
 
         public override void OnInspectorGUI()
         {
-            if (!_refresh_data || _autoOrigin == null)
+            if (!_refresh_data || _fromValue == null)
                 _refreshData();
 
-            EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation starts, the current actual value is used as \"From Value\""));
+            EditorGUILayout.PropertyField(_aniTarget, new GUIContent("Animation Target", "The object that this animation acts on, if not specified, it defaults to the current Transform"));
+
+            EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation start, the current actual value is used as \"From Value\""));
+            EditorGUILayout.PropertyField(_autoTarget, new GUIContent("Auto Target", "If true, When the animation start, the current actual value is used as \"To Value\""));
+
             if (!_autoOrigin.boolValue)
-                EditorGUILayout.PropertyField(_fromAlpha);
-            EditorGUILayout.PropertyField(_toAlpha);
+                EditorGUILayout.PropertyField(_fromValue);
+
+            if (!_autoTarget.boolValue)
+                EditorGUILayout.PropertyField(_toValue);
+
+
+            if (_autoOrigin.boolValue && _autoTarget.boolValue)
+            {
+                EditorUtility.DisplayDialog("Error", "You cannot enable both \"Auto Origin\" and \"Auto Target\"", "Okey");
+                _autoTarget.boolValue = false;
+            }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Set current value as", GUILayout.MaxWidth(140));
+            if (!_autoOrigin.boolValue)
+            {
+                if (GUILayout.Button("Origin", GUILayout.MaxWidth(50)))
+                {
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((CanvasAlphaAni)target).gameObject.GetComponentOrAdd<CanvasGroup>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _fromValue.floatValue = ((CanvasGroup)_aniTarget.objectReferenceValue).alpha;
+                }
+            }
+
+            if (!_autoTarget.boolValue)
+            {
+                if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
+                {
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((CanvasAlphaAni)target).gameObject.GetComponentOrAdd<CanvasGroup>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _toValue.floatValue = ((CanvasGroup)_aniTarget.objectReferenceValue).alpha;
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            GUILayout.Space(5);
             EditorGUILayout.PropertyField(_ease);
 
             base.OnInspectorGUI();

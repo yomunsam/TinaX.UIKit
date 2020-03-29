@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace TinaX.UIKit.Animation
 {
-    [RequireComponent(typeof(RectTransform))]
     [AddComponentMenu("TinaX/UIKit/Animation/RectTransform/AnchoredPosition Ani")]
     public class RectTransformAnchoredPositionAni : UIAnimationBase
     {
+        public RectTransform AniTarget;
         public bool AutoOriginValue = false;
         public Vector2 FromValue;
         public bool AutoTargetValue = false;
@@ -16,33 +16,34 @@ namespace TinaX.UIKit.Animation
 
         private System.IDisposable _disposable;
         private bool pingpong_switch;
-        private RectTransform _rectTransform;
 
         private Vector2? origin_value;
         private Vector2? target_value;
 
         public override void Ready()
         {
-            if (_rectTransform == null) _rectTransform = this.GetComponent<RectTransform>();
+            if (AniTarget == null) AniTarget = this.GetComponent<RectTransform>();
+            if (AniTarget == null) return;
             if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this._rectTransform.anchoredPosition : this.FromValue;
+                origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
             if (target_value == null)
-                target_value = this.AutoTargetValue ? this._rectTransform.anchoredPosition : this.ToValue;
+                target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
 
-            _rectTransform.anchoredPosition = FromValue;
+            AniTarget.anchoredPosition = FromValue;
         }
 
         public override void Play()
         {
-            if (_rectTransform == null) _rectTransform = this.GetComponent<RectTransform>();
+            if (AniTarget == null) AniTarget = this.GetComponent<RectTransform>();
+            if (AniTarget == null) return;
 
             if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this._rectTransform.anchoredPosition : this.FromValue;
+                origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
             if (target_value == null)
-                target_value = this.AutoTargetValue ? this._rectTransform.anchoredPosition : this.ToValue;
+                target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
 
             if (!AutoOriginValue)
-                this._rectTransform.anchoredPosition = this.FromValue;
+                this.AniTarget.anchoredPosition = this.FromValue;
             else
             {
                 this.pingPong = false;
@@ -58,7 +59,8 @@ namespace TinaX.UIKit.Animation
             _disposable = Tween.Play(
                 origin_value.Value,
                 target_value.Value,
-                this.Duration, this.Ease)
+                this.Duration, this.Ease,
+                this.DelayBefore)
                 .Subscribe(doNext, finish);
         }
 
@@ -73,8 +75,8 @@ namespace TinaX.UIKit.Animation
 
         private void doNext(Vector2 value)
         {
-            if (this._rectTransform != null)
-                this._rectTransform.anchoredPosition = value;
+            if (this.AniTarget != null)
+                this.AniTarget.anchoredPosition = value;
         }
 
         private void finish()

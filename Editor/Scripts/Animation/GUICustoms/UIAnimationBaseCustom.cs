@@ -16,6 +16,7 @@ namespace TinaXEditor.UIKit.Animation
         SerializedProperty _duration;
         SerializedProperty _playOnAwake;
         SerializedProperty _pingPong;
+        SerializedProperty _delay_before;
         SerializedProperty _title;
 
         SerializedProperty _onFinish;
@@ -29,6 +30,7 @@ namespace TinaXEditor.UIKit.Animation
             EditorGUILayout.PropertyField(_title, true);
             EditorGUILayout.PropertyField(_duration, true);
             EditorGUILayout.PropertyField(_playOnAwake, true);
+            EditorGUILayout.PropertyField(_delay_before, true);
             EditorGUILayout.PropertyField(_pingPong, true);
             if (_pingPong.boolValue)
             {
@@ -46,6 +48,7 @@ namespace TinaXEditor.UIKit.Animation
             _duration = this.serializedObject.FindProperty("Duration");
             _playOnAwake = this.serializedObject.FindProperty("playOnAwake");
             _pingPong = this.serializedObject.FindProperty("pingPong");
+            _delay_before = this.serializedObject.FindProperty("DelayBefore");
             _title = this.serializedObject.FindProperty("title");
             _onFinish = this.serializedObject.FindProperty("onFinish");
             refresh_data = true;

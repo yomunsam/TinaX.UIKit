@@ -66,7 +66,8 @@ namespace TinaX.UIKit.Animation
             _disposable = Tween.Play(
                 origin_value.Value,
                 target_value.Value,
-                this.Duration, this.Ease)
+                this.Duration, this.Ease,
+                this.DelayBefore)
                 .Subscribe(doNext, finish);
         }
 

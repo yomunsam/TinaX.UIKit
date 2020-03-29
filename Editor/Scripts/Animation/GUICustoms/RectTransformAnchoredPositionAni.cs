@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TinaX.UIKit.Animation;
 using UnityEditor;
-using TinaX.UIKit.Animation;
 using UnityEngine;
 
 namespace TinaXEditor.UIKit.Animation
@@ -12,6 +7,7 @@ namespace TinaXEditor.UIKit.Animation
     [CustomEditor(typeof(RectTransformAnchoredPositionAni),true)]
     public class RectTransformAnchoredPositionAniCustom : UIAnimationBaseCustom
     {
+        SerializedProperty _aniTarget;
         SerializedProperty _autoOrigin;
         SerializedProperty _autoTarget;
         SerializedProperty _fromValue;
@@ -21,6 +17,7 @@ namespace TinaXEditor.UIKit.Animation
         private bool _refresh_data = false;
         private void _refreshData()
         {
+            _aniTarget = this.serializedObject.FindProperty("AniTarget");
             _autoOrigin = this.serializedObject.FindProperty("AutoOriginValue");
             _autoTarget = this.serializedObject.FindProperty("AutoTargetValue");
             _fromValue = this.serializedObject.FindProperty("FromValue");
@@ -35,18 +32,16 @@ namespace TinaXEditor.UIKit.Animation
             if (!_refresh_data || _fromValue == null)
                 _refreshData();
 
+            EditorGUILayout.PropertyField(_aniTarget, new GUIContent("Animation Target", "The object that this animation acts on, if not specified, it defaults to the current Transform"));
+
             EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation start, the current actual value is used as \"From Value\""));
             EditorGUILayout.PropertyField(_autoTarget, new GUIContent("Auto Target", "If true, When the animation start, the current actual value is used as \"To Value\""));
 
             if (!_autoOrigin.boolValue)
-            {
                 EditorGUILayout.PropertyField(_fromValue);
-            }
 
             if (!_autoTarget.boolValue)
-            {
                 EditorGUILayout.PropertyField(_toValue);
-            }
 
             if (_autoOrigin.boolValue && _autoTarget.boolValue)
             {
@@ -60,9 +55,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Origin", GUILayout.MaxWidth(50)))
                 {
-                    var rectTrans = ((RectTransformAnchoredPositionAni)target).GetComponent<RectTransform>();
-                    if (rectTrans != null)
-                        _fromValue.vector2Value = rectTrans.anchoredPosition;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((RectTransformAnchoredPositionAni)target).gameObject.GetComponent<RectTransform>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _fromValue.vector2Value = ((RectTransform)_aniTarget.objectReferenceValue).anchoredPosition;
                 }
             }
                 
@@ -70,9 +66,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
                 {
-                    var rectTrans = ((RectTransformAnchoredPositionAni)target).GetComponent<RectTransform>();
-                    if (rectTrans != null)
-                        _toValue.vector2Value = rectTrans.anchoredPosition;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((RectTransformAnchoredPositionAni)target).gameObject.GetComponent<RectTransform>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _toValue.vector2Value = ((RectTransform)_aniTarget.objectReferenceValue).anchoredPosition;
                 }
             }
             EditorGUILayout.EndHorizontal();

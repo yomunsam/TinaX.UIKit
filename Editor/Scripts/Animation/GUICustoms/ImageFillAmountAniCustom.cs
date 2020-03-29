@@ -7,12 +7,14 @@ using UnityEditor;
 using TinaX.UIKit.Animation;
 using UnityEngine;
 using UnityEngine.UI;
+using TinaX;
 
 namespace TinaXEditor.UIKit.Animation
 {
     [CustomEditor(typeof(ImageFillAmountAni), true)]
     public class ImageFillAmountAniCustom : UIAnimationBaseCustom
     {
+        SerializedProperty _aniTarget;
         SerializedProperty _autoOrigin;
         SerializedProperty _autoTarget;
         SerializedProperty _fromValue;
@@ -22,6 +24,7 @@ namespace TinaXEditor.UIKit.Animation
         private bool _refresh_data = false;
         private void _refreshData()
         {
+            _aniTarget = this.serializedObject.FindProperty("AniTarget");
             _autoOrigin = this.serializedObject.FindProperty("AutoOriginValue");
             _autoTarget = this.serializedObject.FindProperty("AutoTargetValue");
             _fromValue = this.serializedObject.FindProperty("FromValue");
@@ -36,18 +39,15 @@ namespace TinaXEditor.UIKit.Animation
             if (!_refresh_data || _fromValue == null)
                 _refreshData();
 
+            EditorGUILayout.PropertyField(_aniTarget, new GUIContent("Animation Target", "The object that this animation acts on, if not specified, it defaults to the current Transform"));
             EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation start, the current actual value is used as \"From Value\""));
             EditorGUILayout.PropertyField(_autoTarget, new GUIContent("Auto Target", "If true, When the animation start, the current actual value is used as \"To Value\""));
 
             if (!_autoOrigin.boolValue)
-            {
                 EditorGUILayout.PropertyField(_fromValue);
-            }
 
             if (!_autoTarget.boolValue)
-            {
                 EditorGUILayout.PropertyField(_toValue);
-            }
 
             if (_autoOrigin.boolValue && _autoTarget.boolValue)
             {
@@ -61,9 +61,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Origin", GUILayout.MaxWidth(50)))
                 {
-                    var img = ((ImageFillAmountAni)target).GetComponent<Image>();
-                    if (img != null)
-                        _fromValue.floatValue = img.fillAmount;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((ImageFillAmountAni)target).gameObject.GetComponentOrAdd<Image>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _fromValue.floatValue = ((Image)_aniTarget.objectReferenceValue).fillAmount;
                 }
             }
 
@@ -71,9 +72,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
                 {
-                    var image = ((ImageFillAmountAni)target).GetComponent<Image>();
-                    if (image != null)
-                        _toValue.floatValue = image.fillAmount;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((ImageFillAmountAni)target).gameObject.GetComponentOrAdd<Image>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _toValue.floatValue = ((Image)_aniTarget.objectReferenceValue).fillAmount;
                 }
             }
             EditorGUILayout.EndHorizontal();

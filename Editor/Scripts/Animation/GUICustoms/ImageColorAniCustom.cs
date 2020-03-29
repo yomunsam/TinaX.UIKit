@@ -38,20 +38,18 @@ namespace TinaXEditor.UIKit.Animation
         {
             if (!_refresh_data || _fromValue == null)
                 _refreshData();
+
             EditorGUILayout.PropertyField(_aniTarget, new GUIContent("Animation Target", "The object that this animation acts on, if not specified, it defaults to the current Transform"));
 
             EditorGUILayout.PropertyField(_autoOrigin, new GUIContent("Auto Origin", "If true, When the animation start, the current actual value is used as \"From Value\""));
             EditorGUILayout.PropertyField(_autoTarget, new GUIContent("Auto Target", "If true, When the animation start, the current actual value is used as \"To Value\""));
 
             if (!_autoOrigin.boolValue)
-            {
                 EditorGUILayout.PropertyField(_fromValue);
-            }
 
             if (!_autoTarget.boolValue)
-            {
                 EditorGUILayout.PropertyField(_toValue);
-            }
+
 
             if (_autoOrigin.boolValue && _autoTarget.boolValue)
             {
@@ -65,13 +63,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Origin", GUILayout.MaxWidth(50)))
                 {
-                    var _target = ((ImageColorAni)target);
-                    if (_target.AniTarget == null)
-                    {
-                        _target.AniTarget = _target.gameObject.GetComponentOrAdd<Image>();
-                        this.serializedObject.Update();
-                    }
-                    _fromValue.colorValue = _target.AniTarget.color;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((ImageColorAni)target).gameObject.GetComponentOrAdd<Image>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _fromValue.colorValue = ((Image)_aniTarget.objectReferenceValue).color;
                 }
             }
 
@@ -79,13 +74,10 @@ namespace TinaXEditor.UIKit.Animation
             {
                 if (GUILayout.Button("Target", GUILayout.MaxWidth(50)))
                 {
-                    var _target = ((ImageColorAni)target);
-                    if (_target.AniTarget == null)
-                    {
-                        _target.AniTarget = _target.gameObject.GetComponentOrAdd<Image>();
-                        this.serializedObject.Update();
-                    }
-                    _toValue.colorValue = _target.AniTarget.color;
+                    if (_aniTarget.objectReferenceValue == null)
+                        _aniTarget.objectReferenceValue = ((ImageColorAni)target).gameObject.GetComponentOrAdd<Image>();
+                    if (_aniTarget.objectReferenceValue != null)
+                        _toValue.colorValue = ((Image)_aniTarget.objectReferenceValue).color;
                 }
             }
             EditorGUILayout.EndHorizontal();

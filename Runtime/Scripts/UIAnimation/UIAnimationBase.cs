@@ -15,7 +15,8 @@ namespace TinaX.UIKit.Animation
         public string title = "ani";
         public bool playOnAwake = false;
         public bool pingPong = false;
-        public AnimationFinishEvent onFinish;
+        public float DelayBefore = 0;
+        public AnimationFinishEvent onFinish = new AnimationFinishEvent();
 
 
 

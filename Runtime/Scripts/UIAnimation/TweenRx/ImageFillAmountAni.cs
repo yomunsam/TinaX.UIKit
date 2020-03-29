@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 namespace TinaX.UIKit.Animation
 {
-    [RequireComponent(typeof(Image))]
     [AddComponentMenu("TinaX/UIKit/Animation/Image/Image Fill Amount")]
     public class ImageFillAmountAni : UIAnimationBase
     {
+        public Image AniTarget;
         public bool AutoOriginValue = false;
         [Range(0,1)]
         public float FromValue = 0;
@@ -21,31 +21,30 @@ namespace TinaX.UIKit.Animation
 
         private System.IDisposable _disposable;
         private bool pingpong_switch;
-        private Image _image;
 
         float? origin_value;
         float? target_value;
 
         public override void Ready()
         {
-            if (_image == null) _image = this.GetComponent<Image>();
+            if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
             if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this._image.fillAmount : this.FromValue;
+                origin_value = this.AutoOriginValue ? this.AniTarget.fillAmount : this.FromValue;
             if (target_value == null)
-                target_value = this.AutoTargetValue ? this._image.fillAmount : this.ToValue;
+                target_value = this.AutoTargetValue ? this.AniTarget.fillAmount : this.ToValue;
 
-            _image.fillAmount = FromValue;
+            AniTarget.fillAmount = FromValue;
         }
         public override void Play()
         {
-            if (_image == null) _image = this.GetComponent<Image>();
+            if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
             if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this._image.fillAmount : this.FromValue;
+                origin_value = this.AutoOriginValue ? this.AniTarget.fillAmount : this.FromValue;
             if (target_value == null)
-                target_value = this.AutoTargetValue ? this._image.fillAmount : this.ToValue;
+                target_value = this.AutoTargetValue ? this.AniTarget.fillAmount : this.ToValue;
 
             if (!AutoOriginValue)
-                this._image.fillAmount = this.FromValue;
+                this.AniTarget.fillAmount = this.FromValue;
             else
             {
                 this.pingPong = false;
@@ -61,7 +60,8 @@ namespace TinaX.UIKit.Animation
             _disposable = Tween.Play(
                 origin_value.Value,
                 target_value.Value,
-                this.Duration, this.Ease)
+                this.Duration, this.Ease,
+                this.DelayBefore)
                 .Subscribe(doNext, finish);
         }
 
@@ -76,8 +76,8 @@ namespace TinaX.UIKit.Animation
 
         private void doNext(float value)
         {
-            if (this._image != null)
-                this._image.fillAmount = value;
+            if (this.AniTarget != null)
+                this.AniTarget.fillAmount = value;
         }
 
         private void finish()

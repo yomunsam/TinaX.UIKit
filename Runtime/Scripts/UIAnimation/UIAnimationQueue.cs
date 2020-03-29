@@ -70,6 +70,8 @@ namespace TinaX.UIKit.Animation
             }
 
             play_flag = true;
+            index = 0;
+
             doPlay();
 
 
@@ -78,6 +80,7 @@ namespace TinaX.UIKit.Animation
 
         public override void Stop()
         {
+            index = 0;
             if (!play_flag) return;
             play_flag = false;
             if(index < Queues.Count)
@@ -93,6 +96,7 @@ namespace TinaX.UIKit.Animation
                 }
                 
             }
+
             base.Stop();
         }
 
@@ -162,6 +166,7 @@ namespace TinaX.UIKit.Animation
                         //队列结束
                         play_flag = false;
                         this.AniFinish();
+                        index = 0;
                         return;
                     }
                     doPlay();
