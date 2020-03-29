@@ -7,9 +7,9 @@
   "keywords": [
     "TinaX",
     "TinaX Framework",
-    "MonoBehaviour",
-    "XBehaviour",
-    "XComponent"
+    "UI",
+    "UIKit",
+    "UGUI"
   ],
   "author": {
     "name": "yomunsam",
@@ -18,6 +18,8 @@
   },
   "type": "library",
   "dependencies": {
-    
+    "io.nekonya.tinax.core":"6.6.0-preview",
+    "com.neuecc.unirx": "7.1.0",
+    "io.nekonya.tinax.xcomponent":"6.6.0-preview"
   }
 }

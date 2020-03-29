@@ -31,13 +31,15 @@ This package does not depend on other packages.
 
 在安装之前，请先确保已安装如下依赖：
 
-Before setup `TinaX.MonoBehaviour`, please ensure the following dependencies are installed by `Unity Package Manager`:
+Before setup `TinaX.UIKit`, please ensure the following dependencies are installed by `Unity Package Manager`:
 
-- [io.nekonya.tinax.core](https://github.com/yomunsam/tinax.core) :`git://github.com/yomunsam/TinaX.Core.git`
+- **[io.nekonya.tinax.core](https://github.com/yomunsam/tinax.core)** :`git://github.com/yomunsam/TinaX.Core.git`
 
-- [io.nekonya.tinax.xcomponent](https://github.com/yomunsam/tinax.XComponent) :`git://github.com/yomunsam/TinaX.XComponent.git`
+- **[io.nekonya.tinax.xcomponent](https://github.com/yomunsam/tinax.XComponent)** :`git://github.com/yomunsam/TinaX.XComponent.git`
 
-<!-- ------
+- **[com.neuecc.unirx](https://github.com/yomunsam/UniRx.UPM)** :`git://github.com/yomunsam/UniRx.UPM.git`
+
+------
 
 ## Third-Party
 
@@ -45,5 +47,5 @@ Before setup `TinaX.MonoBehaviour`, please ensure the following dependencies are
 
 The following excellent third-party libraries are used in this project:
 
-- **[ILRuntime](https://github.com/Ourpalm/ILRuntime)** : Pure C# IL Intepreter Runtime, which is fast and reliable for scripting requirement on enviorments, where jitting isn't possible. -->
+- **[TweenRx](https://github.com/fumobox/TweenRx)** : Reactive animation utility for Unity.
 
