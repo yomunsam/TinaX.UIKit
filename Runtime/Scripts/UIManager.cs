@@ -174,7 +174,7 @@ namespace TinaX.UIKit
             return entity;
 
         }
-        public void OpenUIAsync(string UIName, Action<IUIEntity,XException> callback, params object[] args)
+        public void OpenUIAsync(string UIName, Action<IUIEntity, XException> callback, params object[] args)
         {
             this.OpenUIAsync(UIName, args)
                 .ToObservable()
@@ -191,8 +191,7 @@ namespace TinaX.UIKit
                         Debug.LogException(e);
                 });
         }
-
-        //-----------UIName 和 xBehaviour 和 参数 ---------------------------------------------
+        //------------------------------------------------------------------------------------------------------
         public IUIEntity OpenUI<T>(string UIName, params object[] args) where T : XBehaviour
         {
             string ui_path = null;
@@ -214,7 +213,7 @@ namespace TinaX.UIKit
             return this.openUI(ui_path, UIName, null, xbehaviour, false, false, default, args);
         }
 
-        public IUIEntity OpenUI(string UIName, Type xBehaviourType, params object[] args)
+        public IUIEntity OpenUIWithBehaviourType(string UIName, Type xBehaviourType, params object[] args)
         {
             string ui_path = null;
             if (mUINameMode == UINameMode.UIGroup)
@@ -231,8 +230,8 @@ namespace TinaX.UIKit
             if (ui_path.IsNullOrEmpty())
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
 
-            if(!xBehaviourType.IsAssignableFrom(typeof(XBehaviour)) && !xBehaviourType.IsSubclassOf(typeof(XBehaviour)))
-                throw new UIKitException($"[TinaX.UIKit] Type {xBehaviourType.FullName} is invalid." , UIKitErrorCode.InvalidXBehaviourType);
+            if (!xBehaviourType.IsAssignableFrom(typeof(XBehaviour)) && !xBehaviourType.IsSubclassOf(typeof(XBehaviour)))
+                throw new UIKitException($"[TinaX.UIKit] Type {xBehaviourType.FullName} is invalid.", UIKitErrorCode.InvalidXBehaviourType);
 
             var xbehaviour = (XBehaviour)XCore.GetMainInstance().CreateInstance(xBehaviourType);
             return this.openUI(ui_path, UIName, null, xbehaviour, false, false, default, args);
@@ -281,7 +280,7 @@ namespace TinaX.UIKit
             return entity;
         }
 
-        public async Task<IUIEntity> OpenUIAsync(string UIName, Type xBehaviourType, params object[] args)
+        public async Task<IUIEntity> OpenUIWithBehaviourTypeAsync(string UIName, Type xBehaviourType, params object[] args)
         {
             string ui_path = null;
             if (mUINameMode == UINameMode.UIGroup)
@@ -297,7 +296,7 @@ namespace TinaX.UIKit
 
             if (ui_path.IsNullOrEmpty())
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
-            
+
             if (!xBehaviourType.IsAssignableFrom(typeof(XBehaviour)) && !xBehaviourType.IsSubclassOf(typeof(XBehaviour)))
                 throw new UIKitException($"[TinaX.UIKit] Type {xBehaviourType.FullName} is invalid.", UIKitErrorCode.InvalidXBehaviourType);
 
@@ -323,14 +322,14 @@ namespace TinaX.UIKit
             if (ui_path.IsNullOrEmpty())
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
 
-            
+
             var entity = await openUIAsync(ui_path, UIName, null, behaviour, false, false, default, args);
             return entity;
         }
 
-        public void OpenUIAsync(string UIName, Type xBehaviourType, Action<IUIEntity,XException> callback,params object[] args)
+        public void OpenUIWithBehaviourTypeAsync(string UIName, Type xBehaviourType, Action<IUIEntity, XException> callback, params object[] args)
         {
-            this.OpenUIAsync(UIName, xBehaviourType, args)
+            this.OpenUIWithBehaviourTypeAsync(UIName, xBehaviourType, args)
                 .ToObservable()
                 .ObserveOnMainThread()
                 .Subscribe(entity =>
@@ -364,7 +363,86 @@ namespace TinaX.UIKit
                 });
         }
 
-        //------------UIName 和 
+
+        //------------全都有-------------------------------------------------------------------------------------
+        public IUIEntity OpenUI(string UIName, OpenUIParam openUIParam, params object[] args)
+        {
+            string ui_path = null;
+            if (mUINameMode == UINameMode.UIGroup)
+            {
+                if (mCurUIGroup != null)
+                {
+                    if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
+                        throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
+                }
+            }
+            else
+                ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
+
+            if (ui_path.IsNullOrEmpty())
+                throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+
+            var entity = this.openUI(ui_path, 
+                UIName, 
+                openUIParam.UIRoot, 
+                openUIParam.xBehaviour, 
+                openUIParam.UseMask, 
+                openUIParam.CloseByMask, 
+                (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor:openUIParam.MaskColor.Value, 
+                args);
+            return entity;
+        }
+
+        public async Task<IUIEntity> OpenUIAsync(string UIName, OpenUIParam openUIParam, params object[] args)
+        {
+            string ui_path = null;
+            if (mUINameMode == UINameMode.UIGroup)
+            {
+                if (mCurUIGroup != null)
+                {
+                    if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
+                        throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
+                }
+            }
+            else
+            {
+                ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
+            }
+
+            if (ui_path.IsNullOrEmpty())
+            {
+                throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+            }
+
+            var entity = await openUIAsync(ui_path,
+                UIName,
+                openUIParam.UIRoot,
+                openUIParam.xBehaviour,
+                openUIParam.UseMask,
+                openUIParam.CloseByMask,
+                (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor : openUIParam.MaskColor.Value,
+                args);
+            return entity;
+        }
+
+        public void OpenUIAsync(string UIName, OpenUIParam openUIParam, Action<IUIEntity, XException> callback, params object[] args)
+        {
+            this.OpenUIAsync(UIName, openUIParam, args)
+                .ToObservable()
+                .ObserveOnMainThread()
+                .Subscribe(
+                entity =>
+                {
+                    callback?.Invoke(entity, null);
+                },
+                e =>
+                {
+                    if (e is XException)
+                        callback?.Invoke(null, e as XException);
+                    else
+                        Debug.LogException(e);
+                });
+        }
 
         #endregion
 

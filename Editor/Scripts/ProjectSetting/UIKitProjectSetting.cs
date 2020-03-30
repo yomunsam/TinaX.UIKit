@@ -98,6 +98,12 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
                         EditorGUILayout.EndHorizontal();
 #endif
 
+                        //Default Mask Color
+                        GUILayout.Space(10);
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(I18Ns.DefaultMaskColor, GUILayout.MaxWidth(200));
+                        mConfig.DefaultUIMaskColor = EditorGUILayout.ColorField(mConfig.DefaultUIMaskColor, GUILayout.MaxWidth(180));
+                        EditorGUILayout.EndHorizontal();
 
                         GUILayout.Space(20);
                         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
@@ -275,6 +281,16 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
                     if (NihongoDesuka)
                         return "UICameraを使用する";
                     return "Use UI Camera";
+                }
+            }
+
+            public static string DefaultMaskColor
+            {
+                get
+                {
+                    if (IsChinese)
+                        return "默认UIMask颜色";
+                    return "Default UIMask Color";
                 }
             }
 
