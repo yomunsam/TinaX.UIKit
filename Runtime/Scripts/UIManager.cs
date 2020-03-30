@@ -606,6 +606,8 @@ namespace TinaX.UIKit
             return entity;
         }
 
+        public IUIEntity OpenUIWithParam(string UIName, OpenUIParam openUIParam, params object[] args) => OpenUI(UIName, openUIParam, args);
+
         public async Task<IUIEntity> OpenUIAsync(string UIName, OpenUIParam openUIParam, params object[] args)
         {
             string ui_path = null;
@@ -656,6 +658,8 @@ namespace TinaX.UIKit
                         Debug.LogException(e);
                 });
         }
+
+        public void OpenUIWithParamAsync(string UIName, OpenUIParam openUIParam, Action<IUIEntity, XException> callback, params object[] args) => OpenUIAsync(UIName, openUIParam, callback, args);
 
         #endregion
 
