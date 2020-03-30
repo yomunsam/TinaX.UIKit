@@ -104,13 +104,14 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
                         var ui_img_folder = mConfig_SerObj.FindProperty("UI_Image_Folders");
                         EditorGUILayout.PropertyField(ui_img_folder);
 
+                        if (mConfig_SerObj.hasModifiedProperties)
+                            mConfig_SerObj.ApplyModifiedProperties();
+                        else
+                            mConfig_SerObj.Update();
                     }
                     EditorGUILayout.EndVertical();
 
-                    if (mConfig_SerObj.hasModifiedProperties)
-                        mConfig_SerObj.ApplyModifiedProperties();
-                    else
-                        mConfig_SerObj.Update();
+                    
                 },
                 deactivateHandler = () =>
                 {
@@ -129,7 +130,8 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
         private static void refreshData()
         {
             mConfig = XConfig.GetConfig<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources, false);
-            mConfig_SerObj = new SerializedObject(mConfig);
+            if (mConfig != null)
+                mConfig_SerObj = new SerializedObject(mConfig);
 
 
             mDataRefreshed = true;

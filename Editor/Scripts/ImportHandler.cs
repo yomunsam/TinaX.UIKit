@@ -28,6 +28,7 @@ namespace TinaXEditor.UIKit.Internal
                 return;
 
             ui_folders.Clear();
+            if (Config.UI_Image_Folders == null) return;
             foreach(var item in Config.UI_Image_Folders)
             {
                 if (!item.Path.StartsWith("Assets/"))
