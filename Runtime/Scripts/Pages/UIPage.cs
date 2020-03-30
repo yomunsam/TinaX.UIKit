@@ -26,13 +26,14 @@ namespace TinaX.UIKit
                 if (UIExitAni == null)
                     return 0;
                 else
-                    return UIExitAni.Duration;
+                    return UIExitAni.GetDurationTime();
             }
         }
 
         public Action OnPageDestroy;
 
         private bool mUI_Ani_Show_Playing = false;
+        private bool mUI_Ani_Exit_Playing = false;
 
         public void TrySetXBehavior(XComponent.XBehaviour xBehaviour)
         {
@@ -99,10 +100,32 @@ namespace TinaX.UIKit
             }
         }
 
+        public void TryPlayExitAni()
+        {
+            if (mUI_Ani_Show_Playing && UIShowAni != null)
+            {
+                UIShowAni.Stop();
+                mUI_Ani_Show_Playing = false;
+            }
+
+            if (UIExitAni != null && !mUI_Ani_Exit_Playing)
+            {
+                mUI_Ani_Exit_Playing = true;
+                UIExitAni.onFinish.RemoveListener(OnExitUIAniFinish);
+                UIExitAni.onFinish.AddListener(OnExitUIAniFinish);
+                UIExitAni.Play();
+            }
+        }
+
         private void OnShowUIAniFinish()
         {
             mUI_Ani_Show_Playing = false;
             this.SendMsg(UIEventConst.ShowUIAnimationFinish);
+        }
+
+        private void OnExitUIAniFinish()
+        {
+            mUI_Ani_Exit_Playing = false;
         }
 
     }

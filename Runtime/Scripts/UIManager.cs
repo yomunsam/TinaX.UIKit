@@ -709,7 +709,7 @@ namespace TinaX.UIKit
             //移除登记
             UIEntities.Remove(entity);
             //传递参数
-            if (args != null)
+            if (args != null && args.Length>0)
                 entity.UIPage.SendCloseUIMessage(args);
             //
             entity.Dispose();

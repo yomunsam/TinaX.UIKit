@@ -6,6 +6,7 @@ using UnityEditor;
 using TinaX.UIKit;
 using TinaX.XComponent;
 using TinaX.UIKit.Animation;
+using TinaXEditor.Utils;
 
 namespace TinaXEditor.UIKit
 {
@@ -101,6 +102,10 @@ namespace TinaXEditor.UIKit
             //音效
 
 
+            if (GUILayout.Button("Edit In Window"))
+            {
+                InspectorInWindow.ShowInspector(target);
+            }
             EditorGUILayout.EndVertical();
         }
 

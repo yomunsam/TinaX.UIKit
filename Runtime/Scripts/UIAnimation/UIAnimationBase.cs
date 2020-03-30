@@ -19,6 +19,10 @@ namespace TinaX.UIKit.Animation
         public AnimationFinishEvent onFinish = new AnimationFinishEvent();
 
 
+        public virtual float GetDurationTime()
+        {
+            return this.Duration;
+        }
 
         protected virtual void Awake()
         {

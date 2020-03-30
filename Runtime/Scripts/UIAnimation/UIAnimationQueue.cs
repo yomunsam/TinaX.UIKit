@@ -100,6 +100,18 @@ namespace TinaX.UIKit.Animation
             base.Stop();
         }
 
+        public override float GetDurationTime()
+        {
+            if (Queues == null || Queues.Count == 0) return 0;
+            if (checkLoopRecursive(this)) return 0;
+            float total = 0;
+            foreach(var item in this.Queues)
+            {
+                total += getMaxDurationTime(item);
+            }
+            return total;
+        }
+
         //递归
         private void doPlay()
         {
@@ -212,6 +224,22 @@ namespace TinaX.UIKit.Animation
             }
 
             return false;
+        }
+
+        private float getMaxDurationTime(QueueItem item)
+        {
+            if (item.UI_Anis == null || item.UI_Anis.Length == 0)
+                return 0;
+            float max = 0;
+            foreach(var i in item.UI_Anis)
+            {
+                if (i.UI_Ani == null)
+                    continue;
+                var _d = i.UI_Ani.GetDurationTime();
+                if (_d > max)
+                    max = _d;
+            }
+            return max;
         }
 
     }

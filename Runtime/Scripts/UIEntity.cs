@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TinaX.UIKit.Internal;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TinaX.UIKit.Entity
 {
@@ -103,11 +104,15 @@ namespace TinaX.UIKit.Entity
             rect_trans.anchorMax = Vector2.one;
             rect_trans.localScale = Vector3.one;
             rect_trans.sizeDelta = Vector2.zero;
+            rect_trans.localPosition = Vector3.zero;
+
+            var g = mGo_Mask.GetComponentOrAdd<GraphicRaycaster>();
 
             mMaskSmartClose = closeByMask;
             if (closeByMask)
             {
                 var btn = mGo_Mask.GetComponentOrAdd<UnityEngine.UI.Button>();
+                btn.transition = UnityEngine.UI.Selectable.Transition.None;
                 btn.targetGraphic = image;
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(OnMaskClicked);
@@ -131,6 +136,7 @@ namespace TinaX.UIKit.Entity
             UIStatue = UIStatus.Unloaded;
             if (UIGameObject != null)
             {
+                this.UIPage.TryPlayExitAni();
                 UIGameObject.Destroy(this.UIPage.DestroyDelayTime);
                 UIGameObject = null;
             }
