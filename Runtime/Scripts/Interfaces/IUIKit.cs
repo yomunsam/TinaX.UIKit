@@ -26,5 +26,13 @@ namespace TinaX.UIKit
         Task<IUIEntity> OpenUIAsync(string UIName, XBehaviour behaviour, params object[] args);
         void OpenUIWithBehaviourTypeAsync(string UIName, Type xBehaviourType, Action<IUIEntity, XException> callback, params object[] args);
         void OpenUIAsync(string UIName, XBehaviour behaviour, Action<IUIEntity, XException> callback, params object[] args);
+        IUIEntity OpenUI<T>(string UIName, OpenUIParam openUIParam, params object[] args) where T : XBehaviour;
+        IUIEntity OpenUIWithBehaviourType(string UIName, Type xBehaviourType, OpenUIParam openUIParam, params object[] args);
+        IUIEntity OpenUI(string UIName, XBehaviour behaviour, OpenUIParam openUIParam, params object[] args);
+        Task<IUIEntity> OpenUIAsync<T>(string UIName, OpenUIParam openUIParam, params object[] args) where T : XBehaviour;
+        Task<IUIEntity> OpenUIWithBehaviourTypeAsync(string UIName, Type xBehaviourType, OpenUIParam openUIParam, params object[] args);
+        Task<IUIEntity> OpenUIAsync(string UIName, XBehaviour behaviour, OpenUIParam openUIParam, params object[] args);
+        void OpenUIWithBehaviourTypeAsync(string UIName, Type xBehaviourType, OpenUIParam openUIParam, Action<IUIEntity, XException> callback, params object[] args);
+        void OpenUIAsync(string UIName, XBehaviour behaviour, OpenUIParam openUIParam, Action<IUIEntity, XException> callback, params object[] args);
     }
 }
