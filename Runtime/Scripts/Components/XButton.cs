@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using TinaX.UIKit.Animation;
 using UnityEngine;
-using TinaX.UIKit.Component;
-using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using TinaX.UIKit.Animation;
+using UnityEngine.UI;
 
-namespace TinaX.UIKit.Component
+namespace TinaX.UIKit.Components
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]

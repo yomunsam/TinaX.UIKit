@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace TinaX.UIKit.Component
+namespace TinaX.UIKit.Components
 {
     public class XUIComponent : MonoBehaviour , IUIComponent
     {

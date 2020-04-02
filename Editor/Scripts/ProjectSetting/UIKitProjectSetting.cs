@@ -11,7 +11,7 @@ using TinaXEditor.UIKit.Const;
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
+namespace TinaXEditor.UIKit.Internal
 {
     public static class UIKitProjectSetting
     {
@@ -143,7 +143,7 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
             mDataRefreshed = true;
         }
 
-        static class Styles
+        private static class Styles
         {
             private static GUIStyle _style_btn_normal; //字体比原版稍微大一号
             public static GUIStyle style_btn_normal
@@ -175,7 +175,7 @@ namespace Packages.io.nekonya.tinax.uikit.Editor.Scripts.ProjectSetting
         }
 
 
-        static class I18Ns
+        private static class I18Ns
         {
             private static bool? _isChinese;
             private static bool IsChinese

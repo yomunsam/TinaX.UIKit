@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-namespace TinaX.UIKit
+namespace TinaX.UIKit.Components
 {
     [AddComponentMenu("TinaX/UIKit/Components/X Empty4Raycast")]
     public class XEmpty4Raycast : MaskableGraphic

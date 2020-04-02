@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TinaX;
 using TinaXEditor.Utils;
-using TinaX.UIKit.Component;
+using TinaX.UIKit.Components;
 using UnityEngine;
 using UnityEditor;
 

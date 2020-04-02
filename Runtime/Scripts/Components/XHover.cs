@@ -3,7 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TinaX.UIKit.Animation;
 
-namespace TinaX.UIKit.Component
+namespace TinaX.UIKit.Components
 {
     [AddComponentMenu("TinaX/UIKit/Components/X Hover")]
     public class XHover : XUIComponent, IPointerEnterHandler, IPointerExitHandler
