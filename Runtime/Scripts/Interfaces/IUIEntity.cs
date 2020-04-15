@@ -8,6 +8,8 @@ namespace TinaX.UIKit
 {
     public interface IUIEntity
     {
+        UIPage UIPage { get;}
+
         void Close(params object[] args);
         void Hide();
         void Show();

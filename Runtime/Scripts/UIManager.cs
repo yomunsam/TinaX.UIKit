@@ -146,7 +146,7 @@ namespace TinaX.UIKit
             if (ui_path.IsNullOrEmpty())
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
 
-            var entity = this.openUI(ui_path, UIName, null, null, false, false, default, args);
+            var entity = this.openUI(ui_path, UIName, null, null, false, false, false, default, args);
             return entity;
         }
         public async Task<IUIEntity> OpenUIAsync(string UIName, params object[] args)
@@ -170,7 +170,7 @@ namespace TinaX.UIKit
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
             }
 
-            var entity = await openUIAsync(ui_path, UIName, null, null, false, false, default, args);
+            var entity = await openUIAsync(ui_path, UIName, null, null,false, false, false, default, args);
             return entity;
 
         }
@@ -210,7 +210,7 @@ namespace TinaX.UIKit
             if (ui_path.IsNullOrEmpty())
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
 
-            return this.openUI(ui_path, UIName, null, behaviour, false, false, default, args);
+            return this.openUI(ui_path, UIName, null, behaviour, true, false, false, default, args);
         }
 
         public IUIEntity OpenUI(string UIName, XBehaviour behaviour, OpenUIParam openUIParam, params object[] args)
@@ -234,6 +234,7 @@ namespace TinaX.UIKit
                 UIName,
                 openUIParam.UIRoot,
                 behaviour,
+                openUIParam.DependencyInjection,
                 openUIParam.UseMask,
                 openUIParam.CloseByMask,
                 (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor : openUIParam.MaskColor.Value,
@@ -258,7 +259,7 @@ namespace TinaX.UIKit
                 throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
 
 
-            var entity = await openUIAsync(ui_path, UIName, null, behaviour, false, false, default, args);
+            var entity = await openUIAsync(ui_path, UIName, null, behaviour, true, false, false, default, args);
             return entity;
         }
 
@@ -284,6 +285,7 @@ namespace TinaX.UIKit
                 UIName,
                 openUIParam.UIRoot,
                 behaviour,
+                openUIParam.DependencyInjection,
                 openUIParam.UseMask,
                 openUIParam.CloseByMask,
                 (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor : openUIParam.MaskColor.Value,
@@ -350,6 +352,7 @@ namespace TinaX.UIKit
                 UIName, 
                 openUIParam.UIRoot, 
                 openUIParam.xBehaviour, 
+                openUIParam.DependencyInjection,
                 openUIParam.UseMask, 
                 openUIParam.CloseByMask, 
                 (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor:openUIParam.MaskColor.Value, 
@@ -384,6 +387,7 @@ namespace TinaX.UIKit
                 UIName,
                 openUIParam.UIRoot,
                 openUIParam.xBehaviour,
+                openUIParam.DependencyInjection,
                 openUIParam.UseMask,
                 openUIParam.CloseByMask,
                 (openUIParam.MaskColor == null) ? mConfig.DefaultUIMaskColor : openUIParam.MaskColor.Value,
@@ -454,7 +458,7 @@ namespace TinaX.UIKit
         /// </summary>
         /// <param name="UINameOrPath"></param>
         /// <param name="ui_root">只有在UI不是ScreenUI的情况下才需要传递这个值</param>
-        private async Task<UIEntity> openUIAsync(string uiPath, string uiName, Transform ui_root, XComponent.XBehaviour xBehaviour, bool UseMask, bool CloseByMask, Color maskColor, params object[] args)
+        private async Task<UIEntity> openUIAsync(string uiPath, string uiName, Transform ui_root, XComponent.XBehaviour xBehaviour, bool inject, bool UseMask, bool CloseByMask, Color maskColor, params object[] args)
         {
             void setTop(UIEntity __entity)
             {
@@ -487,7 +491,7 @@ namespace TinaX.UIKit
 
             //除了上面两种情况，其他都得重新加载
             UIEntity entity = new UIEntity(this, uiName, uiPath);
-            entity.OpenUITask = doOpenUIAsync(entity, ui_root, xBehaviour, UseMask, CloseByMask, maskColor, args);
+            entity.OpenUITask = doOpenUIAsync(entity, ui_root, xBehaviour, inject, UseMask, CloseByMask, maskColor, args);
             this.UIEntities.Register(entity);
 
             await entity.OpenUITask;
@@ -501,7 +505,7 @@ namespace TinaX.UIKit
         /// <param name="entity"></param>
         /// <param name="_ui_root">只有在UI不是ScreenUI的情况下才需要传递这个值</param>
         /// <returns></returns>
-        private async Task doOpenUIAsync(UIEntity entity, Transform _ui_root, XComponent.XBehaviour xBehaviour,bool UseMask,bool CloseByMask, Color maskColor, params object[] args)
+        private async Task doOpenUIAsync(UIEntity entity, Transform _ui_root, XComponent.XBehaviour xBehaviour,bool inject ,bool UseMask,bool CloseByMask, Color maskColor, params object[] args)
         {
             if (entity.UIStatue != UIStatus.Loaded && entity.UIStatue != UIStatus.Unloaded)
                 entity.UIStatue = UIStatus.Loading;
@@ -551,8 +555,9 @@ namespace TinaX.UIKit
             //xbehaviour
             if (xBehaviour != null)
             {
-                XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
-                entity.UIPage.TrySetXBehavior(xBehaviour);
+                if (inject)
+                    XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
+                entity.UIPage.TrySetXBehavior(xBehaviour, inject);
             }
 
             //mask
@@ -568,7 +573,7 @@ namespace TinaX.UIKit
             entity.OpenUITask = Task.CompletedTask;
         }
 
-        private UIEntity openUI(string uiPath, string uiName, Transform ui_root, XComponent.XBehaviour xBehaviour, bool UseMask, bool CloseByMask, Color maskColor, params object[] args)
+        private UIEntity openUI(string uiPath, string uiName, Transform ui_root, XComponent.XBehaviour xBehaviour, bool inject, bool UseMask, bool CloseByMask, Color maskColor, params object[] args)
         {
             void setTop(UIEntity __entity)
             {
@@ -642,8 +647,9 @@ namespace TinaX.UIKit
             //xbehaviour
             if (xBehaviour != null)
             {
-                XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
-                entity.UIPage.TrySetXBehavior(xBehaviour);
+                if (inject)
+                    XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
+                entity.UIPage.TrySetXBehavior(xBehaviour, inject);
             }
 
             //mask

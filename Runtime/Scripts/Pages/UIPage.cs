@@ -35,7 +35,7 @@ namespace TinaX.UIKit
         private bool mUI_Ani_Show_Playing = false;
         private bool mUI_Ani_Exit_Playing = false;
 
-        public void TrySetXBehavior(XComponent.XBehaviour xBehaviour)
+        public void TrySetXBehavior(XComponent.XBehaviour xBehaviour, bool inject = true)
         {
             if(UIMainHandler != null)
             {
@@ -44,7 +44,7 @@ namespace TinaX.UIKit
                     var xcomponent = UIMainHandler as TinaX.XComponent.XComponent;
                     if(xcomponent.Behaviour == null)
                     {
-                        xcomponent.AddBehaviour(xBehaviour, true);
+                        xcomponent.AddBehaviour(xBehaviour, inject);
                     }
                 }
             }

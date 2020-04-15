@@ -16,5 +16,6 @@ namespace TinaX.UIKit
         public Color? MaskColor = null;
         public Transform UIRoot;
         public XComponent.XBehaviour xBehaviour = null;
+        public bool DependencyInjection = true;
     }
 }
