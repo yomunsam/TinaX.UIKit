@@ -22,10 +22,10 @@ namespace TinaXEditor.UIKit
             {
                 int t = 1;
                 string fileName = "UIPage1";
-                while (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), path, fileName)))
+                while (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), path, fileName + ".prefab")))
                 {
                     t++;
-                    fileName = "UIPage" + t;
+                    fileName = "UIPage" + t.ToString();
                 }
                 prefab_path = Path.Combine(path, fileName + ".prefab");
                 ui_name = fileName;
@@ -35,6 +35,7 @@ namespace TinaXEditor.UIKit
             MakeUIPage(ref go);
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, prefab_path);
             UnityEngine.Object.DestroyImmediate(go);
+            AssetDatabase.SaveAssets();
 
         }
 
