@@ -73,7 +73,7 @@ namespace TinaX.UIKit
 
 
             //Init UIKit GameObjects
-                #region UIKit GameObjects
+            #region UIKit GameObjects
             mUIKit_Root_Go = XCore.GetMainInstance().BaseGameObject
                 .FindOrCreateGameObject("UIKit")
                 .SetPosition(new Vector3(-9999, -9999, -9999));
@@ -731,6 +731,19 @@ namespace TinaX.UIKit
                     canvas.renderMode = RenderMode.ScreenSpaceCamera;
                     canvas.worldCamera = mScreenUICamera;
                 }
+
+                var canvasScaler = ui_root_go.GetComponent<CanvasScaler>();
+                canvasScaler.uiScaleMode = mConfig.UICanvasScalerMode;
+                canvasScaler.scaleFactor = mConfig.UIScaleFactor;
+                canvasScaler.referencePixelsPerUnit = mConfig.ReferencePixelsPerUnit;
+
+                canvasScaler.referenceResolution = mConfig.ReferenceResolution;
+                canvasScaler.screenMatchMode = mConfig.ScreenMatchMode;
+                canvasScaler.matchWidthOrHeight = mConfig.CanvasScalerMatchWidthOrHeight;
+
+                canvasScaler.physicalUnit = mConfig.PhySicalUnit;
+                canvasScaler.fallbackScreenDPI = mConfig.FallbackScreenDPI;
+                canvasScaler.defaultSpriteDPI = mConfig.DefaultSpriteDPI;
             }
         }
 

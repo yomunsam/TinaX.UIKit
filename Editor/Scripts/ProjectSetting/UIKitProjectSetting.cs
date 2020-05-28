@@ -105,6 +105,72 @@ namespace TinaXEditor.UIKit.Internal
                         mConfig.DefaultUIMaskColor = EditorGUILayout.ColorField(mConfig.DefaultUIMaskColor, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
+                        #region Canvas Scaler
+                        GUILayout.Space(10);
+                        GUILayout.Label("Canvas Scaler", EditorStyles.boldLabel);
+
+
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("UI Scale Mode", GUILayout.MaxWidth(200));
+                        EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("UICanvasScalerMode"),GUIContent.none, GUILayout.MaxWidth(180));
+                        EditorGUILayout.EndHorizontal();
+
+                        if(mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPixelSize)
+                        {
+                            //Scale Factor
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("UI Scale Factor", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("UIScaleFactor"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+                        }
+                        else if (mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize)
+                        {
+                            //Reference Resolution
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Reference Resolution", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ReferenceResolution"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+
+                            //Reference Resolution
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Screen Match Mode", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ScreenMatchMode"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Match (Width <-> Height)", GUILayout.MaxWidth(200));
+                            mConfig.CanvasScalerMatchWidthOrHeight = EditorGUILayout.Slider(mConfig.CanvasScalerMatchWidthOrHeight, 0, 1, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+
+                        }else if(mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPhysicalSize)
+                        {
+                            //PhySical Unit
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("PhySical Unit", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("PhySicalUnit"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+
+                            //Fallback Screen DPI
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Fallback Screen DPI", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("FallbackScreenDPI"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+
+                            //Default Sprite DPI
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField("Default Sprite DPI", GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("DefaultSpriteDPI"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.EndHorizontal();
+                        }
+
+                        GUILayout.Space(5);
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("Reference Pixels Per Unit", GUILayout.MaxWidth(200));
+                        EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ReferencePixelsPerUnit"), GUIContent.none, GUILayout.MaxWidth(180));
+                        EditorGUILayout.EndHorizontal();
+
+                        #endregion
+
                         GUILayout.Space(20);
                         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
                         var ui_img_folder = mConfig_SerObj.FindProperty("UI_Image_Folders");
