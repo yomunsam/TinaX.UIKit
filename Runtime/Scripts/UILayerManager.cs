@@ -140,7 +140,7 @@ namespace TinaX.UIKit.Internal
             }
             for(var i = mUIStack.Count -1; i >= 0; i--)
             {
-                if(mUIStack[i] == entity)
+                if(mUIStack[i] != entity)
                 {
                     //把在要Remove的entity上面的每个entiy，每个层级挨个缩小一个单位
                     mUIStack[i].SortingOrder -= layerCount_per;
