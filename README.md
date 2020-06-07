@@ -12,15 +12,41 @@ UGUI-based UI framework, including MVC and MVVM implementation.
 
 <br>
 
+## Install this package
+
+### Install via git UPM:
+
 您可以使用Unity Package Manager来安装使用该包。
 
 You can use the Unity Package Manager to install and use this package.  
 
 ```
-git://github.com/yomunsam/TinaX.UIKit.git
+git://github.com/yomunsam/TinaX.XComponent.git
 ```
 
-package name: `io.nekonya.tinax.uikit`
+package name: `io.nekonya.tinax.xcomponent`
+
+If you want to set a target version, you can use release tag like `#6.6.0-preview`. for detail you can see this page: [https://github.com/yomunsam/TinaX.UIKit/releases](https://github.com/yomunsam/TinaX.UIKit/releases)
+
+<br>
+
+### Install via npm (UPM)
+
+Modify `Packages/manifest.json` file in your project, and add the following code before "dependencies" node of this file:
+
+``` json
+"scopedRegistries": [
+    {
+        "name": "TinaX",
+        "url": "https://registry.npmjs.org",
+        "scopes": [
+            "io.nekonya"
+        ]
+    }
+],
+```
+
+<br>
 
 <br>
 ------
