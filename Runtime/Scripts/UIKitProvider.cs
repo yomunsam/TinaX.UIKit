@@ -14,37 +14,25 @@ namespace TinaX.UIKit
     [XServiceProviderOrder(100)]
     public class UIKitProvider : IXServiceProvider
     {
-        private IXCore mCore;
 
         public string ServiceName => UIConst.ServiceName;
 
-        public Task<bool> OnInit()
+        public Task<XException> OnInit(IXCore core)
+            => Task.FromResult<XException>(null);
+
+
+        public void OnServiceRegister(IXCore core)
         {
-            mCore = XCore.GetMainInstance();
-
-            return Task.FromResult(true);
-        }
-
-        public XException GetInitException() => null;
-
-
-        public void OnServiceRegister()
-        {
-            mCore.BindSingletonService<IUIKit, UIManager>().SetAlias<IUIKitInternal>();
+            core.Services.Singleton<IUIKit, UIManager>()
+                .SetAlias<IUIKitInternal>();
         }
 
 
-        public Task<bool> OnStart()
+        public Task<XException> OnStart(IXCore core)
         {
-            return mCore.GetService<IUIKitInternal>().Start();
+            return core.Services.Get<IUIKitInternal>().Start();
         }
-        public XException GetStartException()
-        {
-            return mCore.GetService<IUIKitInternal>().GetStartException();
-        }
-
-
-
+        
         public void OnQuit() { }
 
         public Task OnRestart() => Task.CompletedTask;

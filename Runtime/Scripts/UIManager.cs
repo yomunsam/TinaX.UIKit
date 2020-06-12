@@ -29,7 +29,6 @@ namespace TinaX.UIKit
         private string mUIRootDirLoadPath_withSlash;
 
         private bool mInited = false;
-        private XException mStartException;
 
         private GameObject mUIKit_Root_Go;
         private Canvas mScreenUIRoot_Canvas;
@@ -43,17 +42,15 @@ namespace TinaX.UIKit
 
         private UIEntityManager UIEntities = new UIEntityManager();
 
-        public async Task<bool> Start()
+        public async Task<XException> Start()
         {
             #region config
-            if (mInited) return true;
+            if (mInited) return null;
             mConfig = XConfig.GetConfig<UIConfig>(UIConst.ConfigPath_Resources);
             if (mConfig == null)
-            {
-                mStartException = new XException("[TinaX.UIKit] Connot found config file."); ;
-                return false;
-            }
-            if (!mConfig.EnableUIKit) return true;
+                return new XException("[TinaX.UIKit] Connot found config file.");
+
+            if (!mConfig.EnableUIKit) return null;
 
             if (mConfig.UINameMode == UINameMode.UIGroup)
                 mCurUIGroup = mConfig.DefaultUIGroup;
@@ -120,10 +117,9 @@ namespace TinaX.UIKit
 
             #endregion
 
-            await Task.Delay(0);
-            return true;
+            await Task.Yield();
+            return null;
         }
-        public XException GetStartException() => mStartException;
 
         #region OpenUI方法
 
@@ -557,7 +553,14 @@ namespace TinaX.UIKit
             {
                 if (inject)
                     XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
-                entity.UIPage.TrySetXBehavior(xBehaviour, inject);
+                if (xBehaviour is XUIBehaviour)
+                {
+                    var uibehaviour = xBehaviour as XUIBehaviour;
+                    uibehaviour.UIEntity = entity;
+                    entity.UIPage.TrySetXBehavior(uibehaviour, inject);
+                }
+                else
+                    entity.UIPage.TrySetXBehavior(xBehaviour, inject);
             }
 
             //mask
@@ -649,7 +652,15 @@ namespace TinaX.UIKit
             {
                 if (inject)
                     XCore.GetMainInstance().InjectObject(xBehaviour); //依赖注入，Services
-                entity.UIPage.TrySetXBehavior(xBehaviour, inject);
+
+                if (xBehaviour is XUIBehaviour)
+                {
+                    var uibehaviour = xBehaviour as XUIBehaviour;
+                    uibehaviour.UIEntity = entity;
+                    entity.UIPage.TrySetXBehavior(uibehaviour, inject);
+                }
+                else
+                    entity.UIPage.TrySetXBehavior(xBehaviour, inject);
             }
 
             //mask

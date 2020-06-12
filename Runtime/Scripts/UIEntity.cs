@@ -9,7 +9,9 @@ using UnityEngine.UI;
 
 namespace TinaX.UIKit.Entity
 {
+#pragma warning disable CA1063 // Implement IDisposable Correctly
     public class UIEntity : IUIEntity , IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
     {
         public string UIName;
         public string UIPath;
@@ -130,8 +132,10 @@ namespace TinaX.UIKit.Entity
             if (mGo_Mask != null)
                 mGo_Mask.Show();
         }
-        
+
+#pragma warning disable CA1063 // Implement IDisposable Correctly
         public void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
         {
             UIStatue = UIStatus.Unloaded;
             if (UIGameObject != null)
@@ -142,7 +146,7 @@ namespace TinaX.UIKit.Entity
             }
             if(UIPrefab != null)
             {
-                if(XCore.GetMainInstance().TryGetBuiltinService<TinaX.Services.IAssetService>(out var assets))
+                if(XCore.GetMainInstance().Services.TryGetBuildInService<TinaX.Services.IAssetService>(out var assets))
                 {
                     assets.Release(UIPrefab);
                 }

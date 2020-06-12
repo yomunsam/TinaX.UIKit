@@ -10,7 +10,6 @@ namespace TinaX.UIKit.Internal
     public interface IUIKitInternal
     {
         void CloseUI(UIEntity entity, params object[] args);
-        XException GetStartException();
-        Task<bool> Start();
+        Task<XException> Start();
     }
 }
