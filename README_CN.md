@@ -198,4 +198,3 @@ git://github.com/yomunsam/TinaX.UIKit.git
 本项目中使用了以下优秀的第三方库：
 
 - **[TweenRx](https://github.com/fumobox/TweenRx)** : Reactive animation utility for Unity.
-- **[UniTask](https://github.com/Cysharp/UniTask)** : Provides an efficient async/await integration to Unity.
