@@ -17,8 +17,7 @@ namespace TinaX.UIKit
 {
     public class UIManager : IUIKit, IUIKitInternal
     {
-        [Inject(true)]
-        [CatLib.Container.Inject(Required = false)]
+        [Inject]
         public IAssetService Assets { get; set; }
 
         private UIConfig mConfig;
