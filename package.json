@@ -1,6 +1,6 @@
 {
   "name": "io.nekonya.tinax.uikit",
-  "version": "6.6.4",
+  "version": "6.6.5",
   "displayName": "TinaX.UIKit",
   "description": "UGUI-based UI framework",
   "unity": "2019.4",
@@ -21,6 +21,6 @@
   "dependencies": {
     "io.nekonya.tinax.core":"6.6.3",
     "com.neuecc.unirx": "7.1.0",
-    "io.nekonya.tinax.xcomponent":"6.6.1"
+    "io.nekonya.tinax.xcomponent":"6.6.3"
   }
 }

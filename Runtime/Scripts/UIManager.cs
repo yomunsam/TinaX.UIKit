@@ -567,7 +567,7 @@ namespace TinaX.UIKit
                 entity.ShowMask(CloseByMask, maskColor);
 
             //OpenUI事件
-            if (args != null)
+            if (args != null && args.Length > 0)
             {
                 entity.UIPage.SendOpenUIMessage(args);
             }
@@ -667,7 +667,7 @@ namespace TinaX.UIKit
                 entity.ShowMask(CloseByMask, maskColor);
 
             //OpenUI事件
-            if (args != null)
+            if (args != null && args.Length > 0)
             {
                 entity.UIPage.SendOpenUIMessage(args);
             }

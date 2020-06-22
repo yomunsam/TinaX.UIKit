@@ -4,7 +4,7 @@ namespace TinaX.UIKit
 {
     public class XUIBehaviour : XBehaviour
     {
-        public IUIEntity UIEntity { get; internal set; }
+        public IUIEntity UIEntity { get; set; }
 
         protected void Hide()
         {

@@ -69,7 +69,7 @@ namespace TinaX.UIKit
                 if (UIMainHandler is XComponentScriptBase)
                 {
                     var xcomponent = UIMainHandler as XComponentScriptBase;
-                    xcomponent.SendMsg(msg_name, args);
+                    xcomponent.SendQueueMsg(msg_name, args);
                 }
                 else if (UIMainHandler is MonoBehaviour)
                 {
