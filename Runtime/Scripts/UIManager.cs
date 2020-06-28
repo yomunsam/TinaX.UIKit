@@ -458,7 +458,7 @@ namespace TinaX.UIKit
             void setTop(UIEntity __entity)
             {
                 //置顶
-                if (mDict_UILayers.TryGetValue(__entity.SortingLayerID, out var layer))
+                if (mDict_UILayers.TryGetValue(__entity.SortingLayerValue, out var layer))
                     layer.Top(__entity);
             }
             //加载检查
@@ -518,13 +518,15 @@ namespace TinaX.UIKit
                 if (uiPage.ScreenUI)
                 {
                     //Screen UI， 使用UIKit Screen UIRoot
-                    if (!SortingLayer.IsValid(uiPage.SortingLayerID))
-                        uiPage.SortingLayerID = 0;
-                    Transform trans_uiroot = getScreenUIRoot(uiPage.SortingLayerID);
+
+                    //if (!SortingLayer.layers.Any(sl=> sl.value == uiPage.SortingLayerValue))
+                    //    uiPage.SortingLayerValue = 0;
+                    Transform trans_uiroot = getScreenUIRoot(uiPage.SortingLayerId);
                     entity.UIGameObject = UnityEngine.GameObject.Instantiate(prefab, trans_uiroot);
                     if (entity.UIGameObject.name.Length > 7)
                         entity.UIGameObject.Name(entity.UIGameObject.name.Substring(0, entity.UIGameObject.name.Length - 7));
 
+                    
                 }
                 else
                 {
@@ -537,14 +539,15 @@ namespace TinaX.UIKit
 
             entity.UIPage = entity.UIGameObject.GetComponent<UIPage>();
             entity.UICanvas = entity.UIGameObject.GetComponentOrAdd<Canvas>();
-            entity.UICanvas.sortingLayerID = entity.UIPage.SortingLayerID;
             if (entity.UIPage.ScreenUI)
             {
                 entity.UICanvas.overrideSorting = true;
+                entity.UICanvas.sortingLayerID = entity.UIPage.SortingLayerId;
+
                 //UI层级
-                if (!mDict_UILayers.ContainsKey(entity.SortingLayerID))
-                    mDict_UILayers.Add(entity.SortingLayerID, new UILayerManager());
-                mDict_UILayers[entity.SortingLayerID].Register(entity);
+                if (!mDict_UILayers.ContainsKey(entity.SortingLayerId))
+                    mDict_UILayers.Add(entity.SortingLayerId, new UILayerManager());
+                mDict_UILayers[entity.SortingLayerId].Register(entity);
             }
 
             //xbehaviour
@@ -580,7 +583,7 @@ namespace TinaX.UIKit
             void setTop(UIEntity __entity)
             {
                 //置顶
-                if (mDict_UILayers.TryGetValue(__entity.SortingLayerID, out var layer))
+                if (mDict_UILayers.TryGetValue(__entity.SortingLayerValue, out var layer))
                     layer.Top(__entity);
             }
 
@@ -603,6 +606,7 @@ namespace TinaX.UIKit
 
             UIEntity entity = new UIEntity(this, uiName, uiPath);
 
+            
             if (entity.UIGameObject == null)
             {
                 var prefab = Assets.Load<GameObject>(entity.UIPath);
@@ -613,16 +617,17 @@ namespace TinaX.UIKit
                     Assets.Release(prefab);
                     throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"无法打开UI \"{ui_name}\" , 这不是一个有效的UI页文件。" : $"Unable to open UI \"{ui_name}\", this is not a valid UI Page file."), UIKitErrorCode.InvalidUIPage);
                 }
+
                 if (uiPage.ScreenUI)
                 {
                     //Screen UI， 使用UIKit Screen UIRoot
-                    if (!SortingLayer.IsValid(uiPage.SortingLayerID))
-                        uiPage.SortingLayerID = 0;
-                    Transform trans_uiroot = getScreenUIRoot(uiPage.SortingLayerID);
+                    //if (!SortingLayer.layers.Any(sl => sl.value == uiPage.SortingLayerValue))
+                    //    uiPage.SortingLayerValue = 0;
+                    Transform trans_uiroot = getScreenUIRoot(uiPage.SortingLayerId);
                     entity.UIGameObject = UnityEngine.Object.Instantiate(prefab, trans_uiroot);
                     if (entity.UIGameObject.name.Length > 7)
                         entity.UIGameObject.Name(entity.UIGameObject.name.Substring(0, entity.UIGameObject.name.Length - 7));
-
+                    
                 }
                 else
                 {
@@ -636,14 +641,15 @@ namespace TinaX.UIKit
 
             entity.UIPage = entity.UIGameObject.GetComponent<UIPage>();
             entity.UICanvas = entity.UIGameObject.GetComponentOrAdd<Canvas>();
-            entity.UICanvas.sortingLayerID = entity.UIPage.SortingLayerID;
             if (entity.UIPage.ScreenUI)
             {
                 entity.UICanvas.overrideSorting = true;
+                entity.UICanvas.sortingLayerID = entity.UIPage.SortingLayerId;
+
                 //UI层级
-                if (!mDict_UILayers.ContainsKey(entity.SortingLayerID))
-                    mDict_UILayers.Add(entity.SortingLayerID, new UILayerManager());
-                mDict_UILayers[entity.SortingLayerID].Register(entity);
+                if (!mDict_UILayers.ContainsKey(entity.SortingLayerId))
+                    mDict_UILayers.Add(entity.SortingLayerId, new UILayerManager());
+                mDict_UILayers[entity.SortingLayerId].Register(entity);
             }
 
             //xbehaviour
@@ -686,7 +692,7 @@ namespace TinaX.UIKit
         private void closeUI(UIEntity entity, params object[] args)
         {
             //退还layer
-            if(mDict_UILayers.TryGetValue(entity.SortingLayerID,out var layer))
+            if(mDict_UILayers.TryGetValue(entity.SortingLayerValue,out var layer))
             {
                 layer.Remove(entity);
             }

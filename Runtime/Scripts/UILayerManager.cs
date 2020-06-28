@@ -84,7 +84,7 @@ namespace TinaX.UIKit.Internal
             if (!mUIStack.Contains(entity)) return;
 
 
-            int max_layer = mUIStack.Last().SortingLayerID;
+            int max_layer = mUIStack.Last().SortingLayerValue;
             for(var i = mUIStack.Count - 1; i >= 0; i--)
             {
                 if(mUIStack[i] != entity)

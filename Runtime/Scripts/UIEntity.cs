@@ -48,7 +48,8 @@ namespace TinaX.UIKit.Entity
                     mCanvas_Mask.sortingOrder = value - 1;
             }
         }
-        public int SortingLayerID => this.UIPage.SortingLayerID;
+        public int SortingLayerValue => this.UIPage.SortingLayerValue;
+        public int SortingLayerId => this.UIPage.SortingLayerId;
         public bool AllowMultiple => this.UIPage.AllowMultiple;
 
         private GameObject mGo_Mask;

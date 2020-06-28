@@ -4,6 +4,7 @@ using UnityEngine;
 using TinaX.XComponent;
 using System;
 using TinaX.UIKit.Animation;
+using System.Linq;
 
 namespace TinaX.UIKit
 {
@@ -12,7 +13,33 @@ namespace TinaX.UIKit
         public bool ScreenUI = true;
         public bool FullScreenUI = false;
 
-        public int SortingLayerID = 0;
+        public int SortingLayerValue;
+
+        private int? _sortingLayerId;
+        private int? _sortingLayerIdByValue;
+
+        public int SortingLayerId
+        { 
+            get
+            {
+                if (_sortingLayerId == null || _sortingLayerIdByValue == null || _sortingLayerIdByValue.Value != SortingLayerValue)
+                {
+                    try
+                    {
+                        var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).First();
+                        _sortingLayerId = layer.id;
+                        _sortingLayerIdByValue = this.SortingLayerValue;
+                    }
+                    catch
+                    {
+                        this.SortingLayerValue = 0;
+                        _sortingLayerId = 0;
+                        _sortingLayerIdByValue = this.SortingLayerValue;
+                    }
+                }
+                return _sortingLayerId.Value;
+            }
+        }
         public bool AllowMultiple = false;
         public UnityEngine.Object UIMainHandler;
 
@@ -81,6 +108,9 @@ namespace TinaX.UIKit
 
         private void Awake()
         {
+            //var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).FirstOrDefault();
+            //this.GetComponent<Canvas>().
+
             if(UIShowAni != null)
             {
                 mUI_Ani_Show_Playing = true;

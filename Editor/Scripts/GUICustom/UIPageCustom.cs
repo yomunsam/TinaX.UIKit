@@ -14,36 +14,48 @@ namespace TinaXEditor.UIKit
     public class UIPageCustom : Editor
     {
         private UIPage _target;
+        private SerializedObject _target_seriablizedObj;
 
-        
+        private SerializedProperty _mainUIHandler;
+        private SerializedProperty _fullScreenUI;
+        private SerializedProperty _screenUI;
+        private SerializedProperty _allowMultiple;
+        private SerializedProperty _sortingLayer;
+        private SerializedProperty _uiShowAni;
+        private SerializedProperty _uiExitAni;
 
         public override void OnInspectorGUI()
         {
             if (_target == null)
                 _target = (UIPage)target;
+            if (_target_seriablizedObj == null)
+                _target_seriablizedObj = new SerializedObject(_target);
             EditorGUILayout.BeginVertical();
 
             //处理者
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(I18Ns.UIHandler, I18Ns.UIHandler_Tooltips), GUILayout.MaxWidth(100));
-            _target.UIMainHandler = EditorGUILayout.ObjectField(_target.UIMainHandler, typeof(UnityEngine.MonoBehaviour), true);
+            if (_mainUIHandler == null && _target_seriablizedObj != null)
+                _mainUIHandler = _target_seriablizedObj.FindProperty("UIMainHandler");
+            EditorGUILayout.PropertyField(_mainUIHandler, GUIContent.none);
+            //_target.UIMainHandler = EditorGUILayout.ObjectField(_target.UIMainHandler, typeof(UnityEngine.MonoBehaviour), true);
             EditorGUILayout.EndHorizontal();
 
             //处理者的奇怪判断
-            if(_target.UIMainHandler == null)
+            if(_mainUIHandler.objectReferenceValue == null)
             {
                 var xc = _target.gameObject.GetComponent<XComponentScriptBase>();
                 if(xc != null)
                 {
                     if(GUILayout.Button(string.Format(I18Ns.Btn_SetHandler,xc.GetType().Name)))
                     {
-                        _target.UIMainHandler = xc;
+                        _mainUIHandler.objectReferenceValue = xc;
                     }
                 }
             }
             else
             {
-                if (!_target.UIMainHandler.GetType().IsSubclassOf(typeof(MonoBehaviour)))
+                if (!_mainUIHandler.objectReferenceValue.GetType().IsSubclassOf(typeof(MonoBehaviour)))
                 {
                     //无效警告
                     EditorGUILayout.LabelField(I18Ns.UIHandlerInvalid, Styles.label_warning);
@@ -54,32 +66,48 @@ namespace TinaXEditor.UIKit
             GUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(I18Ns.FullScreenUI, I18Ns.FullScreenUI_ToolTips), GUILayout.MaxWidth(100));
-            _target.FullScreenUI = EditorGUILayout.Toggle(_target.FullScreenUI);
+            if (_fullScreenUI == null && _target_seriablizedObj != null)
+                _fullScreenUI = _target_seriablizedObj.FindProperty("FullScreenUI");
+            EditorGUILayout.PropertyField(_fullScreenUI, GUIContent.none);
+            //_target.FullScreenUI = EditorGUILayout.Toggle(_target.FullScreenUI);
             EditorGUILayout.EndHorizontal();
 
             //Screen UI
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Screen UI", GUILayout.MaxWidth(100));
-            _target.ScreenUI = EditorGUILayout.Toggle(_target.ScreenUI);
+            if (_screenUI == null && _target_seriablizedObj != null)
+                _screenUI = _target_seriablizedObj.FindProperty("ScreenUI");
+            EditorGUILayout.PropertyField(_screenUI, GUIContent.none);
+
+            //_target.ScreenUI = EditorGUILayout.Toggle(_target.ScreenUI);
             EditorGUILayout.EndHorizontal();
 
             //多开
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(I18Ns.MultipleUI, I18Ns.MultipleUI_Tooltips), GUILayout.MaxWidth(100));
-            _target.AllowMultiple = EditorGUILayout.Toggle(_target.AllowMultiple);
+            if (_allowMultiple == null && _target_seriablizedObj != null)
+                _allowMultiple = _target_seriablizedObj.FindProperty("AllowMultiple");
+            EditorGUILayout.PropertyField(_allowMultiple, GUIContent.none);
+            //_target.AllowMultiple = EditorGUILayout.Toggle(_target.AllowMultiple);
             EditorGUILayout.EndHorizontal();
 
             //SortingLayer
             GUILayout.Space(10);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("SortingLayer", GUILayout.MaxWidth(100));
-            int sorting_layer_id = 0;
-            if (SortingLayer.IsValid(_target.SortingLayerID))
-                sorting_layer_id = _target.SortingLayerID;
+            if (_sortingLayer == null && _target_seriablizedObj != null)
+                _sortingLayer = _target_seriablizedObj.FindProperty("SortingLayerValue");
+
+            int sorting_layer_value = 0;
+            
+            
+            if (SortingLayer.layers.Any(sl => sl.value == _sortingLayer.intValue))
+                sorting_layer_value = _sortingLayer.intValue;
             var sorting_layers = SortingLayer.layers;
             var sorting_layer_names = sorting_layers.Select(s => s.name).ToArray();
+            sorting_layer_value = EditorGUILayout.Popup(sorting_layer_value, sorting_layer_names);
+            _sortingLayer.intValue = sorting_layer_value;
 
-            sorting_layer_id = EditorGUILayout.Popup(sorting_layer_id, sorting_layer_names);
             EditorGUILayout.EndHorizontal();
 
             //动画-----------------------------------------------------------------------
@@ -87,17 +115,26 @@ namespace TinaXEditor.UIKit
             EditorGUILayout.LabelField("UI Animation", EditorStyles.largeLabel);
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(I18Ns.UIShow_Ani), GUILayout.MaxWidth(120));
-            _target.UIShowAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIShowAni,typeof(UIAnimationBase),true);
+            if (_uiShowAni == null && _target_seriablizedObj != null)
+                _uiShowAni = _target_seriablizedObj.FindProperty("UIShowAni");
+            EditorGUILayout.PropertyField(_uiShowAni, GUIContent.none);
+
+            //_target.UIShowAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIShowAni,typeof(UIAnimationBase),true);
             EditorGUILayout.EndHorizontal();
-            if (_target.UIShowAni != null)
-                _target.UIShowAni.playOnAwake = false;
+            if (_uiShowAni.objectReferenceValue != null)
+                ((UIAnimationBase)_uiShowAni.objectReferenceValue).playOnAwake = false;
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(I18Ns.UIExit_Ani), GUILayout.MaxWidth(120));
-            _target.UIExitAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIExitAni, typeof(UIAnimationBase), true);
+            if (_uiExitAni == null && _target_seriablizedObj != null)
+                _uiExitAni = _target_seriablizedObj.FindProperty("UIExitAni");
+            EditorGUILayout.PropertyField(_uiExitAni, GUIContent.none);
+            //_target.UIExitAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIExitAni, typeof(UIAnimationBase), true);
             EditorGUILayout.EndHorizontal();
-            if (_target.UIExitAni != null)
-                _target.UIExitAni.pingPong = false;
+            if (_uiExitAni.objectReferenceValue != null)
+                ((UIAnimationBase)_uiExitAni.objectReferenceValue).pingPong = false;
+            //if (_target.UIExitAni != null)
+            //    _target.UIExitAni.pingPong = false;
 
             //音效
 
@@ -107,6 +144,9 @@ namespace TinaXEditor.UIKit
                 InspectorInWindow.ShowInspector(target);
             }
             EditorGUILayout.EndVertical();
+
+            if (_target_seriablizedObj != null)
+                _target_seriablizedObj.ApplyModifiedProperties();
         }
 
         static class Styles
@@ -264,7 +304,7 @@ namespace TinaXEditor.UIKit
                 get
                 {
                     if (IsChinese)
-                        return "UI显示动画";
+                        return "UI退出动画";
                     if (NihongoDesuka)
                         return "UI終了アニメーション";
                     return "UI Exit Animation";
