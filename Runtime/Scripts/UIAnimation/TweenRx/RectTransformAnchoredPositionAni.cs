@@ -24,10 +24,8 @@ namespace TinaX.UIKit.Animation
         {
             if (AniTarget == null) AniTarget = this.GetComponent<RectTransform>();
             if (AniTarget == null) return;
-            if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
-            if (target_value == null)
-                target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
+            origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
 
             AniTarget.anchoredPosition = FromValue;
         }
@@ -37,10 +35,8 @@ namespace TinaX.UIKit.Animation
             if (AniTarget == null) AniTarget = this.GetComponent<RectTransform>();
             if (AniTarget == null) return;
 
-            if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
-            if (target_value == null)
-                target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
+            origin_value = this.AutoOriginValue ? this.AniTarget.anchoredPosition : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.anchoredPosition : this.ToValue;
 
             if (!AutoOriginValue)
                 this.AniTarget.anchoredPosition = this.FromValue;

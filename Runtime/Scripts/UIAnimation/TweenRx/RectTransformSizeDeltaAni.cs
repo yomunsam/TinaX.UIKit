@@ -29,10 +29,8 @@ namespace TinaX.UIKit.Animation
                 if (AniTarget == null)
                     return;
             }
-            if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this.AniTarget.sizeDelta : this.FromValue;
-            if (target_value == null)
-                target_value = this.AutoTargetValue ? this.AniTarget.sizeDelta : this.ToValue;
+            origin_value = this.AutoOriginValue ? this.AniTarget.sizeDelta : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.sizeDelta : this.ToValue;
 
             AniTarget.sizeDelta = FromValue;
         }
@@ -44,10 +42,8 @@ namespace TinaX.UIKit.Animation
                 if (AniTarget == null)
                     return;
             }
-            if (origin_value == null)
-                origin_value = this.AutoOriginValue ? this.AniTarget.sizeDelta : this.FromValue;
-            if (target_value == null)
-                target_value = this.AutoTargetValue ? this.AniTarget.sizeDelta : this.ToValue;
+            origin_value = this.AutoOriginValue ? this.AniTarget.sizeDelta : this.FromValue;
+            target_value = this.AutoTargetValue ? this.AniTarget.sizeDelta : this.ToValue;
 
             if (!AutoOriginValue)
                 this.AniTarget.sizeDelta = this.FromValue;

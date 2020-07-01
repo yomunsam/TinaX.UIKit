@@ -28,9 +28,7 @@ namespace TinaX.UIKit.Animation
         public override void Ready()
         {
             if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
-            if (origin_value == null)
                 origin_value = this.AutoOriginValue ? this.AniTarget.fillAmount : this.FromValue;
-            if (target_value == null)
                 target_value = this.AutoTargetValue ? this.AniTarget.fillAmount : this.ToValue;
 
             AniTarget.fillAmount = FromValue;
@@ -38,9 +36,7 @@ namespace TinaX.UIKit.Animation
         public override void Play()
         {
             if (AniTarget == null) AniTarget = this.transform.GetComponentOrAdd<Image>();
-            if (origin_value == null)
                 origin_value = this.AutoOriginValue ? this.AniTarget.fillAmount : this.FromValue;
-            if (target_value == null)
                 target_value = this.AutoTargetValue ? this.AniTarget.fillAmount : this.ToValue;
 
             if (!AutoOriginValue)
