@@ -30,7 +30,7 @@ namespace TinaX.UIKit
         private bool mInited = false;
 
         private GameObject mUIKit_Root_Go;
-        private Canvas mScreenUIRoot_Canvas;
+        //private Canvas mScreenUIRoot_Canvas;
         private Camera mScreenUICamera;
         private Dictionary<int, GameObject> mDict_UIRoot_SortingLayer_Go = new Dictionary<int, GameObject>();
         private Dictionary<int, Canvas> mDict_UIRootCanvas_SortingLayer_Canvas = new Dictionary<int, Canvas>();
@@ -40,6 +40,8 @@ namespace TinaX.UIKit
         private Dictionary<int, UILayerManager> mDict_UILayers = new Dictionary<int, UILayerManager>();
 
         private UIEntityManager UIEntities = new UIEntityManager();
+
+        public Camera UICamera => mScreenUICamera;
 
         public async Task<XException> Start()
         {

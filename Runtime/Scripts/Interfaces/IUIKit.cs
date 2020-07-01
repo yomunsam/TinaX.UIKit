@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using TinaX.UIKit.Entity;
 using TinaX.XComponent;
+using UnityEngine;
 
 namespace TinaX.UIKit
 {
     public interface IUIKit
     {
+        Camera UICamera { get; }
+
         void CloseUI(UIEntity entity, params object[] args);
         void CloseUI(string UIName, params object[] args);
 
