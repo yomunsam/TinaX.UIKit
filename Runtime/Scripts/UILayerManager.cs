@@ -84,7 +84,7 @@ namespace TinaX.UIKit.Internal
             if (!mUIStack.Contains(entity)) return;
 
 
-            int max_layer = mUIStack.Last().SortingLayerValue;
+            int max_order = mUIStack.Last().SortingOrder;
             for(var i = mUIStack.Count - 1; i >= 0; i--)
             {
                 if(mUIStack[i] != entity)
@@ -93,7 +93,7 @@ namespace TinaX.UIKit.Internal
                 }
                 else
                 {
-                    entity.SortingOrder = max_layer;
+                    entity.SortingOrder = max_order;
                     //调换stack中的次序，置顶的放到最后面
                     var temp = mUIStack.Last();
                     if (temp.UIPage.FullScreenUI)

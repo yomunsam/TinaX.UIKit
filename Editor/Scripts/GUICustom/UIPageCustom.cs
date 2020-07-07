@@ -7,6 +7,7 @@ using TinaX.UIKit;
 using TinaX.XComponent;
 using TinaX.UIKit.Animation;
 using TinaXEditor.Utils;
+using UnityEngine.Rendering;
 
 namespace TinaXEditor.UIKit
 {
@@ -96,17 +97,35 @@ namespace TinaXEditor.UIKit
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("SortingLayer", GUILayout.MaxWidth(100));
             if (_sortingLayer == null && _target_seriablizedObj != null)
-                _sortingLayer = _target_seriablizedObj.FindProperty("SortingLayerValue");
+                _sortingLayer = _target_seriablizedObj.FindProperty("SortingLayerId");
 
-            int sorting_layer_value = 0;
-            
-            
-            if (SortingLayer.layers.Any(sl => sl.value == _sortingLayer.intValue))
-                sorting_layer_value = _sortingLayer.intValue;
+            //int sorting_layer_value = 0;
+
+
+            //if (SortingLayer.layers.Any(sl => sl.value == _sortingLayer.intValue))
+            //    sorting_layer_value = _sortingLayer.intValue;
+            //var sorting_layers = SortingLayer.layers;
+            //var sorting_layer_names = sorting_layers.Select(s => s.name).ToArray();
+            //sorting_layer_value = EditorGUILayout.Popup(sorting_layer_value, sorting_layer_names);
+            //_sortingLayer.intValue = sorting_layer_value;
+
             var sorting_layers = SortingLayer.layers;
-            var sorting_layer_names = sorting_layers.Select(s => s.name).ToArray();
-            sorting_layer_value = EditorGUILayout.Popup(sorting_layer_value, sorting_layer_names);
-            _sortingLayer.intValue = sorting_layer_value;
+            var sorting_layer_ids = sorting_layers.Select(sl => sl.id).ToArray();
+            var sorting_layer_names = sorting_layers.Select(sl => sl.name).ToArray();
+
+            int sorting_layer_select_index = 0;
+            for(var i = 0; i < sorting_layer_ids.Length; i++)
+            {
+                if(sorting_layer_ids[i] == _sortingLayer.intValue)
+                {
+                    sorting_layer_select_index = i;
+                    break;
+                }
+            }
+            sorting_layer_select_index = EditorGUILayout.Popup(sorting_layer_select_index, sorting_layer_names);
+            _sortingLayer.intValue = sorting_layer_ids[sorting_layer_select_index];
+
+
 
             EditorGUILayout.EndHorizontal();
 

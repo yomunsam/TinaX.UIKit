@@ -97,6 +97,7 @@ namespace TinaX.UIKit.Entity
             mCanvas_Mask = mGo_Mask.GetComponentOrAdd<Canvas>();
             mCanvas_Mask.overrideSorting = true;
             mCanvas_Mask.sortingOrder = this.SortingOrder - 1;
+            mCanvas_Mask.sortingLayerID = this.SortingLayerId;
 
             var image = mGo_Mask.GetComponentOrAdd<UnityEngine.UI.Image>();
             image.color = maskColor;

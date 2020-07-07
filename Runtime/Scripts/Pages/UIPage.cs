@@ -13,33 +13,67 @@ namespace TinaX.UIKit
         public bool ScreenUI = true;
         public bool FullScreenUI = false;
 
-        public int SortingLayerValue;
+        public int SortingLayerId;
 
-        private int? _sortingLayerId;
-        private int? _sortingLayerIdByValue;
 
-        public int SortingLayerId
-        { 
+        private SortingLayer? _sortingLayer;
+        private int? _sortingLayerById; //上面的这个Layer信息是从哪获取到的
+
+        public SortingLayer SortingLayer
+        {
             get
             {
-                if (_sortingLayerId == null || _sortingLayerIdByValue == null || _sortingLayerIdByValue.Value != SortingLayerValue)
+                if(_sortingLayer == null || _sortingLayerById == null || _sortingLayerById.Value != SortingLayerId)
                 {
                     try
                     {
-                        var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).First();
-                        _sortingLayerId = layer.id;
-                        _sortingLayerIdByValue = this.SortingLayerValue;
+                        _sortingLayer = SortingLayer.layers.Where(sl => sl.id == this.SortingLayerId).Single();
+                        _sortingLayerById = _sortingLayer.Value.id;
                     }
                     catch
                     {
-                        this.SortingLayerValue = 0;
-                        _sortingLayerId = 0;
-                        _sortingLayerIdByValue = this.SortingLayerValue;
+                        _sortingLayer = SortingLayer.layers.FirstOrDefault();
+                        SortingLayerId = _sortingLayer.Value.id;
+                        _sortingLayerById = SortingLayerId;
                     }
                 }
-                return _sortingLayerId.Value;
+                return _sortingLayer.Value;
             }
         }
+
+
+        public int SortingLayerValue => this.SortingLayer.value;
+
+        public string SortingLayerName => this.SortingLayer.name;
+
+        //public int SortingLayerValue;
+
+        //private int? _sortingLayerId;
+        //private int? _sortingLayerIdByValue;
+
+        //public int SortingLayerId
+        //{ 
+        //    get
+        //    {
+        //        if (_sortingLayerId == null || _sortingLayerIdByValue == null || _sortingLayerIdByValue.Value != SortingLayerValue)
+        //        {
+        //            try
+        //            {
+        //                var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).First();
+        //                _sortingLayerId = layer.id;
+        //                _sortingLayerIdByValue = this.SortingLayerValue;
+        //            }
+        //            catch
+        //            {
+        //                this.SortingLayerValue = 0;
+        //                _sortingLayerId = 0;
+        //                _sortingLayerIdByValue = this.SortingLayerValue;
+        //            }
+        //        }
+        //        return _sortingLayerId.Value;
+        //    }
+        //}
+
         public bool AllowMultiple = false;
         public UnityEngine.Object UIMainHandler;
 
