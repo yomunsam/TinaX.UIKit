@@ -282,6 +282,9 @@ namespace TinaXEditor.UIKit.Internal
 
         private static void RefreshSpritesInAtlas(string sa_path, string rootDir)
         {
+            if (s_UseLegacyAtlas)
+                return;
+
             string[] sprite_guids = AssetDatabase.FindAssets("t:Sprite", new string[] { rootDir });
             List<string> spritePaths = new List<string>();
 
