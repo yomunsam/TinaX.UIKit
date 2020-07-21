@@ -9,6 +9,7 @@ using TinaX.UIKit.Const;
 using TinaX.UIKit.Internal;
 using TinaXEditor.UIKit.Const;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace TinaXEditor.UIKit.Internal
@@ -18,6 +19,9 @@ namespace TinaXEditor.UIKit.Internal
         private static bool m_DataRefreshed = false;
         private static UIConfig m_Config;
         private static SerializedObject m_Config_SerObj;
+
+        private static ReorderableList m_list_images;
+
 
         [SettingsProvider]
         public static SettingsProvider XRuntimeSetting()
@@ -172,15 +176,58 @@ namespace TinaXEditor.UIKit.Internal
                         #endregion
 
                         GUILayout.Space(20);
-                        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                        var ui_img_folder = m_Config_SerObj.FindProperty("UI_Image_Folders");
-                        EditorGUILayout.PropertyField(ui_img_folder);
+                        //EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                        //var ui_img_folder = m_Config_SerObj.FindProperty("UI_Image_Folders");
+                        //EditorGUILayout.PropertyField(ui_img_folder);
 
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(I18Ns.UseLegacySpritePacker, GUILayout.MaxWidth(200));
                         EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("UseLegacySpritePacker"), GUIContent.none);
                         EditorGUILayout.EndHorizontal();
 
+                        if(m_list_images == null)
+                        {
+                            m_list_images = new ReorderableList(m_Config_SerObj,
+                                m_Config_SerObj.FindProperty("UI_Image_Folders"),
+                                true,
+                                true,
+                                true,
+                                true);
+                            m_list_images.elementHeightCallback = (index) =>
+                            {
+                                float single_line_height = EditorGUIUtility.singleLineHeight + 2;
+                                return single_line_height * 1 + 2;
+                            };
+                            m_list_images.drawHeaderCallback = rect =>
+                            {
+                                EditorGUI.LabelField(rect, I18Ns.TitleUIImageFolder);
+                            };
+                            m_list_images.drawElementCallback = (rect, index, isActive, isFocused) =>
+                            {
+                                rect.y += 2;
+                                rect.height = EditorGUIUtility.singleLineHeight;
+                                var singleLine = EditorGUIUtility.singleLineHeight + 2;
+
+                                SerializedProperty itemData = m_list_images.serializedProperty.GetArrayElementAtIndex(index);
+                                SerializedProperty item_path = itemData.FindPropertyRelative("Path");
+                                SerializedProperty item_atlas = itemData.FindPropertyRelative("Atlas");
+
+                                var rect_path = rect;
+                                rect_path.width -= 85;
+
+                                EditorGUI.PropertyField(rect_path, item_path,GUIContent.none);
+
+                                var rect_atlas_label = rect;
+                                rect_atlas_label.x += rect_path.width + 15;
+                                rect_atlas_label.width = 40;
+                                EditorGUI.LabelField(rect_atlas_label, new GUIContent(I18Ns.IsAtlas));
+
+                                var rect_atlas = rect_atlas_label;
+                                rect_atlas.x += 40;
+                                EditorGUI.PropertyField(rect_atlas, item_atlas, GUIContent.none);
+                            };
+                        }
+                        m_list_images.DoLayoutList();
 
                         if (m_Config_SerObj.hasModifiedProperties)
                             m_Config_SerObj.ApplyModifiedProperties();
@@ -249,29 +296,10 @@ namespace TinaXEditor.UIKit.Internal
 
         private static class I18Ns
         {
-            private static bool? _isChinese;
-            private static bool IsChinese
-            {
-                get
-                {
-                    if (_isChinese == null)
-                    {
-                        _isChinese = (Application.systemLanguage == SystemLanguage.Chinese || Application.systemLanguage == SystemLanguage.ChineseSimplified);
-                    }
-                    return _isChinese.Value;
-                }
-            }
+            private static bool IsChinese => TinaXEditor.Utils.EditorGUIUtil.IsCmnHans;
 
-            private static bool? _nihongo_desuka;
-            private static bool NihongoDesuka
-            {
-                get
-                {
-                    if (_nihongo_desuka == null)
-                        _nihongo_desuka = (Application.systemLanguage == SystemLanguage.Japanese);
-                    return _nihongo_desuka.Value;
-                }
-            }
+
+            private static bool NihongoDesuka => TinaXEditor.Utils.EditorGUIUtil.IsJapanese;
 
             public static string NoConfig
             {
@@ -397,6 +425,26 @@ namespace TinaXEditor.UIKit.Internal
                     if (IsChinese)
                         return "使用 Sprite Packer (旧版图集)";
                     return "Use Sprite Packer (Legacy)";
+                }
+            }
+
+            public static string TitleUIImageFolder
+            {
+                get
+                {
+                    if (IsChinese)
+                        return "UI 图片目录";
+                    return "UI Image Folders";
+                }
+            }
+
+            public static string IsAtlas
+            {
+                get
+                {
+                    if (IsChinese)
+                        return "图集：";
+                    return "Atlas:";
                 }
             }
         }

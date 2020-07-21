@@ -141,10 +141,10 @@ namespace TinaXEditor.UIKit.Internal
 
             if (lastImportedAssets != null)
             {
-                Debug.Log("需要进行重复判断");
-                Debug.Log("上次导入处理时间：" + lastAllPostprocessTime);
-                Debug.Log("本次导入处理时间：" + DateTime.UtcNow);
-                Debug.Log("时差：" + (DateTime.UtcNow - lastAllPostprocessTime).TotalSeconds + "秒");
+                //Debug.Log("需要进行重复判断");
+                //Debug.Log("上次导入处理时间：" + lastAllPostprocessTime);
+                //Debug.Log("本次导入处理时间：" + DateTime.UtcNow);
+                //Debug.Log("时差：" + (DateTime.UtcNow - lastAllPostprocessTime).TotalSeconds + "秒");
                 if (lastImportedAssets.Length == importedAssets.Length)
                 {
                     bool flag = false; //如果对比结果不一致，这置为true
