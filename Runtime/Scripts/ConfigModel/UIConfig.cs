@@ -44,6 +44,7 @@ namespace TinaX.UIKit.Internal
         #endregion
 
         public List<UIFolderItem> UI_Image_Folders;
+        public bool UseLegacySpritePacker = false; //使用旧版图集
 
         [System.Serializable]
         public struct UIFolderItem

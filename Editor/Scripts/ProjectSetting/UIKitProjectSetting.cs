@@ -15,9 +15,9 @@ namespace TinaXEditor.UIKit.Internal
 {
     public static class UIKitProjectSetting
     {
-        private static bool mDataRefreshed = false;
-        private static UIConfig mConfig;
-        private static SerializedObject mConfig_SerObj;
+        private static bool m_DataRefreshed = false;
+        private static UIConfig m_Config;
+        private static SerializedObject m_Config_SerObj;
 
         [SettingsProvider]
         public static SettingsProvider XRuntimeSetting()
@@ -27,15 +27,15 @@ namespace TinaXEditor.UIKit.Internal
                 label = "X UIKit",
                 guiHandler = (searchContent) =>
                 {
-                    if (!mDataRefreshed) refreshData();
+                    if (!m_DataRefreshed) refreshData();
                     EditorGUILayout.BeginVertical(Styles.body);
-                    if (mConfig == null)
+                    if (m_Config == null)
                     {
                         GUILayout.Space(20);
                         GUILayout.Label(I18Ns.NoConfig);
                         if (GUILayout.Button(I18Ns.BtnCreateConfigFile, Styles.style_btn_normal, GUILayout.MaxWidth(120)))
                         {
-                            mConfig = XConfig.CreateConfigIfNotExists<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources);
+                            m_Config = XConfig.CreateConfigIfNotExists<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources);
                             refreshData();
                         }
                     }
@@ -43,48 +43,48 @@ namespace TinaXEditor.UIKit.Internal
                     {
                         GUILayout.Space(20);
                         //Enable
-                        mConfig.EnableUIKit = EditorGUILayout.ToggleLeft(I18Ns.EnableUIKit, mConfig.EnableUIKit);
+                        m_Config.EnableUIKit = EditorGUILayout.ToggleLeft(I18Ns.EnableUIKit, m_Config.EnableUIKit);
 
                         //UI Name Mode
                         GUILayout.Space(10);
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(I18Ns.UINameMode, GUILayout.MaxWidth(200));
-                        mConfig.UINameMode = (UINameMode)EditorGUILayout.EnumPopup(mConfig.UINameMode,GUILayout.MaxWidth(180));
+                        m_Config.UINameMode = (UINameMode)EditorGUILayout.EnumPopup(m_Config.UINameMode,GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
                         //Default UI Group 
-                        if (mConfig.UINameMode == UINameMode.UIGroup)
+                        if (m_Config.UINameMode == UINameMode.UIGroup)
                         {
                             GUILayout.Space(3);
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(I18Ns.DefaultUIGroup, GUILayout.MaxWidth(200));
-                            mConfig.DefaultUIGroup = (UIGroup)EditorGUILayout.ObjectField(mConfig.DefaultUIGroup,typeof(UIGroup),false, GUILayout.MaxWidth(180));
+                            m_Config.DefaultUIGroup = (UIGroup)EditorGUILayout.ObjectField(m_Config.DefaultUIGroup,typeof(UIGroup),false, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
                         }
 
-                        if(mConfig.UINameMode == UINameMode.RelativeDirectory)
+                        if(m_Config.UINameMode == UINameMode.RelativeDirectory)
                         {
                             GUILayout.Space(3);
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(I18Ns.UIRootDirLoadPath, GUILayout.MaxWidth(200));
-                            mConfig.UIRootDirectoryLoadPath = EditorGUILayout.TextField(mConfig.UIRootDirectoryLoadPath);
+                            m_Config.UIRootDirectoryLoadPath = EditorGUILayout.TextField(m_Config.UIRootDirectoryLoadPath);
                             EditorGUILayout.EndHorizontal();
-                            mConfig.DefaultUIGroup = null;
+                            m_Config.DefaultUIGroup = null;
                         }
 
                         //Use UICamera
                         GUILayout.Space(10);
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(I18Ns.UseDefaultUICamera, GUILayout.MaxWidth(200));
-                        mConfig.UseUICamera = EditorGUILayout.Toggle(mConfig.UseUICamera, GUILayout.MaxWidth(180));
+                        m_Config.UseUICamera = EditorGUILayout.Toggle(m_Config.UseUICamera, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
-                        if (mConfig.UseUICamera)
+                        if (m_Config.UseUICamera)
                         {
                             GUILayout.Space(3);
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField(I18Ns.UICameraConfig, GUILayout.MaxWidth(200));
-                            mConfig.UICameraConfig = (UICameraConfig)EditorGUILayout.ObjectField(mConfig.UICameraConfig, typeof(UICameraConfig), false, GUILayout.MaxWidth(180));
+                            m_Config.UICameraConfig = (UICameraConfig)EditorGUILayout.ObjectField(m_Config.UICameraConfig, typeof(UICameraConfig), false, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
                             
                         }
@@ -94,7 +94,7 @@ namespace TinaXEditor.UIKit.Internal
                         GUILayout.Space(10);
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(I18Ns.AutoCreateEventSystem, GUILayout.MaxWidth(200));
-                        mConfig.AutoCreateEventSystem = EditorGUILayout.Toggle(mConfig.AutoCreateEventSystem, GUILayout.MaxWidth(180));
+                        m_Config.AutoCreateEventSystem = EditorGUILayout.Toggle(m_Config.AutoCreateEventSystem, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 #endif
 
@@ -102,7 +102,7 @@ namespace TinaXEditor.UIKit.Internal
                         GUILayout.Space(10);
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField(I18Ns.DefaultMaskColor, GUILayout.MaxWidth(200));
-                        mConfig.DefaultUIMaskColor = EditorGUILayout.ColorField(mConfig.DefaultUIMaskColor, GUILayout.MaxWidth(180));
+                        m_Config.DefaultUIMaskColor = EditorGUILayout.ColorField(m_Config.DefaultUIMaskColor, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
                         #region Canvas Scaler
@@ -112,74 +112,80 @@ namespace TinaXEditor.UIKit.Internal
 
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("UI Scale Mode", GUILayout.MaxWidth(200));
-                        EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("UICanvasScalerMode"),GUIContent.none, GUILayout.MaxWidth(180));
+                        EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("UICanvasScalerMode"),GUIContent.none, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
-                        if(mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPixelSize)
+                        if(m_Config.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPixelSize)
                         {
                             //Scale Factor
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("UI Scale Factor", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("UIScaleFactor"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("UIScaleFactor"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
                         }
-                        else if (mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize)
+                        else if (m_Config.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize)
                         {
                             //Reference Resolution
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("Reference Resolution", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ReferenceResolution"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("ReferenceResolution"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
 
                             //Reference Resolution
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("Screen Match Mode", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ScreenMatchMode"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("ScreenMatchMode"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
 
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("Match (Width <-> Height)", GUILayout.MaxWidth(200));
-                            mConfig.CanvasScalerMatchWidthOrHeight = EditorGUILayout.Slider(mConfig.CanvasScalerMatchWidthOrHeight, 0, 1, GUILayout.MaxWidth(180));
+                            m_Config.CanvasScalerMatchWidthOrHeight = EditorGUILayout.Slider(m_Config.CanvasScalerMatchWidthOrHeight, 0, 1, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
 
-                        }else if(mConfig.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPhysicalSize)
+                        }else if(m_Config.UICanvasScalerMode == UnityEngine.UI.CanvasScaler.ScaleMode.ConstantPhysicalSize)
                         {
                             //PhySical Unit
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("PhySical Unit", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("PhySicalUnit"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("PhySicalUnit"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
 
                             //Fallback Screen DPI
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("Fallback Screen DPI", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("FallbackScreenDPI"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("FallbackScreenDPI"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
 
                             //Default Sprite DPI
                             EditorGUILayout.BeginHorizontal();
                             EditorGUILayout.LabelField("Default Sprite DPI", GUILayout.MaxWidth(200));
-                            EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("DefaultSpriteDPI"), GUIContent.none, GUILayout.MaxWidth(180));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("DefaultSpriteDPI"), GUIContent.none, GUILayout.MaxWidth(180));
                             EditorGUILayout.EndHorizontal();
                         }
 
                         GUILayout.Space(5);
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("Reference Pixels Per Unit", GUILayout.MaxWidth(200));
-                        EditorGUILayout.PropertyField(mConfig_SerObj.FindProperty("ReferencePixelsPerUnit"), GUIContent.none, GUILayout.MaxWidth(180));
+                        EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("ReferencePixelsPerUnit"), GUIContent.none, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
 
                         #endregion
 
                         GUILayout.Space(20);
                         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-                        var ui_img_folder = mConfig_SerObj.FindProperty("UI_Image_Folders");
+                        var ui_img_folder = m_Config_SerObj.FindProperty("UI_Image_Folders");
                         EditorGUILayout.PropertyField(ui_img_folder);
 
-                        if (mConfig_SerObj.hasModifiedProperties)
-                            mConfig_SerObj.ApplyModifiedProperties();
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(I18Ns.UseLegacySpritePacker, GUILayout.MaxWidth(200));
+                        EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("UseLegacySpritePacker"), GUIContent.none);
+                        EditorGUILayout.EndHorizontal();
+
+
+                        if (m_Config_SerObj.hasModifiedProperties)
+                            m_Config_SerObj.ApplyModifiedProperties();
                         else
-                            mConfig_SerObj.Update();
+                            m_Config_SerObj.Update();
                     }
                     EditorGUILayout.EndVertical();
 
@@ -187,9 +193,9 @@ namespace TinaXEditor.UIKit.Internal
                 },
                 deactivateHandler = () =>
                 {
-                    if (mConfig != null)
+                    if (m_Config != null)
                     {
-                        EditorUtility.SetDirty(mConfig);
+                        EditorUtility.SetDirty(m_Config);
                         AssetDatabase.SaveAssets();
                         AssetDatabase.Refresh();
 
@@ -201,12 +207,12 @@ namespace TinaXEditor.UIKit.Internal
 
         private static void refreshData()
         {
-            mConfig = XConfig.GetConfig<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources, false);
-            if (mConfig != null)
-                mConfig_SerObj = new SerializedObject(mConfig);
+            m_Config = XConfig.GetConfig<UIConfig>(UIConst.ConfigPath_Resources, AssetLoadType.Resources, false);
+            if (m_Config != null)
+                m_Config_SerObj = new SerializedObject(m_Config);
 
 
-            mDataRefreshed = true;
+            m_DataRefreshed = true;
         }
 
         private static class Styles
@@ -381,6 +387,16 @@ namespace TinaXEditor.UIKit.Internal
                     if (NihongoDesuka)
                         return "EventSystemを自動的に作成する";
                     return "Auto Create EventSystem";
+                }
+            }
+
+            public static string UseLegacySpritePacker
+            {
+                get
+                {
+                    if (IsChinese)
+                        return "使用 Sprite Packer (旧版图集)";
+                    return "Use Sprite Packer (Legacy)";
                 }
             }
         }
