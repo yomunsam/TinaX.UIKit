@@ -9,7 +9,7 @@ using TinaX.UIKit.Components;
 using UnityEngine;
 using UnityEditor;
 
-namespace TinaXEditor.UIKit.Component
+namespace TinaXEditor.UIKit.Components
 {
     [CustomEditor(typeof(XHover))]
     public class HoverCustom : Editor
