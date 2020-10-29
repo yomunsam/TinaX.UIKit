@@ -93,6 +93,7 @@ namespace TinaX.UIKit
 
         public Action OnPageDestroy;
 
+
         private bool mUI_Ani_Show_Playing = false;
         private bool mUI_Ani_Exit_Playing = false;
 
@@ -120,8 +121,6 @@ namespace TinaX.UIKit
         {
             this.SendMsg(UIEventConst.CloseUI, args);
         }
-
-
 
         private void SendMsg(string msg_name, params object[] args)
         {

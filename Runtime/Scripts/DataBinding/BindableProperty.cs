@@ -6,8 +6,8 @@ namespace TinaX.UIKit.DataBinding
 {
     public class BindableProperty<T>
     {
-        public delegate void ValueChangedDalegate(T oldValue, T newValue);
-        public ValueChangedDalegate ValueChanged;
+        public delegate void ValueChangedDelegate(T oldValue, T newValue);
+        public ValueChangedDelegate ValueChanged;
 
         private T _value;
 
@@ -36,7 +36,7 @@ namespace TinaX.UIKit.DataBinding
             this.ValueChanged?.Invoke(_value, _value);
         }
 
-        public void OnValueChanged(ValueChangedDalegate callback)
+        public void OnValueChanged(ValueChangedDelegate callback)
         {
             this.ValueChanged += callback;
         }
