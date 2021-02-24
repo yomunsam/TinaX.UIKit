@@ -2,7 +2,7 @@
 
 namespace TinaX.Services
 {
-    public static class UIKitServiceExtend
+    public static class UIKitServiceExtension
     {
         public static IXCore UseUIKit(this IXCore core)
         {
