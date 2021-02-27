@@ -9,8 +9,8 @@ namespace TinaX.UIKit.Components
     public class XHover : XUIComponent, IPointerEnterHandler, IPointerExitHandler
     {
         #region Ani
-        public UIAnimationBase EnterAnimation;
-        public UIAnimationBase ExitAnimation;
+        //public UIAnimationBase EnterAnimation;
+        //public UIAnimationBase ExitAnimation;
         #endregion
 
         [Space(10)]
@@ -21,10 +21,10 @@ namespace TinaX.UIKit.Components
         public void OnPointerEnter(PointerEventData eventData)
         {
             #region Ani
-            if (ExitAnimation != null)
-                ExitAnimation.Stop();
-            if (EnterAnimation != null)
-                EnterAnimation.Play();
+            //if (ExitAnimation != null)
+            //    ExitAnimation.Stop();
+            //if (EnterAnimation != null)
+            //    EnterAnimation.Play();
             #endregion
 
             OnEnter?.Invoke();
@@ -33,10 +33,10 @@ namespace TinaX.UIKit.Components
         public void OnPointerExit(PointerEventData eventData)
         {
             #region Ani
-            if (EnterAnimation != null)
-                EnterAnimation.Stop();
-            if (ExitAnimation != null)
-                ExitAnimation.Play();
+            //if (EnterAnimation != null)
+            //    EnterAnimation.Stop();
+            //if (ExitAnimation != null)
+            //    ExitAnimation.Play();
             #endregion
 
             OnExit?.Invoke();

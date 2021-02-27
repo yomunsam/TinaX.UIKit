@@ -11,6 +11,6 @@ namespace TinaX.UIKit
         public const string OpenUI = "OnOpenUIMessage";
         public const string CloseUI = "OnCloseUIMessage";
 
-        public const string ShowUIAnimationFinish = "OnShowUIAnimationFinish";
+        //public const string ShowUIAnimationFinish = "OnShowUIAnimationFinish";
     }
 }

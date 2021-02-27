@@ -30,7 +30,7 @@ namespace TinaX.UIKit.Entity
             {
                 _uiPage = value;
                 if (value != null)
-                    _uiPage.OnPageDestroy = OnUIDestory;
+                    _uiPage.OnDestroyUI += OnUIDestory;
             }
         }
         public GameObject UIGameObject;
@@ -142,8 +142,12 @@ namespace TinaX.UIKit.Entity
             UIStatue = UIStatus.Unloaded;
             if (UIGameObject != null)
             {
-                this.UIPage.TryPlayExitAni();
-                UIGameObject.Destroy(this.UIPage.DestroyDelayTime);
+                //触发CloseUI事件
+                this.UIPage.OnCloseUIEvent?.Invoke();
+                this.UIPage.OnCloseUI?.Invoke(this.UIPage.DestroyDelay);
+
+
+                UIGameObject.Destroy(this.UIPage.DestroyDelay);
                 UIGameObject = null;
             }
             if(UIPrefab != null)

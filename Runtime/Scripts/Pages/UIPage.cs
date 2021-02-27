@@ -5,6 +5,7 @@ using TinaX.XComponent;
 using System;
 using TinaX.UIKit.Animation;
 using System.Linq;
+using TinaX.UIKit.UnityEvents;
 
 namespace TinaX.UIKit
 {
@@ -46,56 +47,30 @@ namespace TinaX.UIKit
 
         public string SortingLayerName => this.SortingLayer.name;
 
-        //public int SortingLayerValue;
-
-        //private int? _sortingLayerId;
-        //private int? _sortingLayerIdByValue;
-
-        //public int SortingLayerId
-        //{ 
-        //    get
-        //    {
-        //        if (_sortingLayerId == null || _sortingLayerIdByValue == null || _sortingLayerIdByValue.Value != SortingLayerValue)
-        //        {
-        //            try
-        //            {
-        //                var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).First();
-        //                _sortingLayerId = layer.id;
-        //                _sortingLayerIdByValue = this.SortingLayerValue;
-        //            }
-        //            catch
-        //            {
-        //                this.SortingLayerValue = 0;
-        //                _sortingLayerId = 0;
-        //                _sortingLayerIdByValue = this.SortingLayerValue;
-        //            }
-        //        }
-        //        return _sortingLayerId.Value;
-        //    }
-        //}
 
         public bool AllowMultiple = false;
         public UnityEngine.Object UIMainHandler;
 
-        public UIAnimationBase UIShowAni;
-        public UIAnimationBase UIExitAni;
+        public UIPageEventBase OnOpenUIEvent = new UIPageEventBase();
+        public UIPageEventBase OnShowUIEvent = new UIPageEventBase();
+        public UIPageEventBase OnHideUIEvent = new UIPageEventBase();
+        public UIPageEventBase OnCloseUIEvent = new UIPageEventBase();
+        public UIPageEventBase OnDestroyUIEvent = new UIPageEventBase();
 
-        public float DestroyDelayTime
-        {
-            get
-            {
-                if (UIExitAni == null)
-                    return 0;
-                else
-                    return UIExitAni.GetDurationTime();
-            }
-        }
-
-        public Action OnPageDestroy;
+        public Action OnOpenUI { get; set; }
+        public Action OnShowUI { get; set; }
+        public Action OnHideUI { get; set; }
+        public Action<float> OnCloseUI { get; set; } //float参数为UI延迟销毁时间
+        public Action OnDestroyUI { get; set; }
 
 
-        private bool mUI_Ani_Show_Playing = false;
-        private bool mUI_Ani_Exit_Playing = false;
+        /// <summary>
+        /// UI GameObject销毁的延迟时间，可用于诸如UI关闭动画等场合
+        /// </summary>
+        public float DestroyDelay { get; set; } = 0;
+
+
+        
 
         public void TrySetXBehavior(XComponent.XBehaviour xBehaviour, bool inject = true)
         {
@@ -141,54 +116,16 @@ namespace TinaX.UIKit
 
         private void Awake()
         {
-            //var layer = SortingLayer.layers.Where(sl => sl.value == this.SortingLayerValue).FirstOrDefault();
-            //this.GetComponent<Canvas>().
-
-            if(UIShowAni != null)
-            {
-                mUI_Ani_Show_Playing = true;
-                UIShowAni.onFinish.AddListener(OnShowUIAniFinish);
-                UIShowAni.Play();
-            }
+            OnOpenUI?.Invoke();
         }
 
 
         private void OnDestroy()
         {
-            this.OnPageDestroy?.Invoke();
-            if(mUI_Ani_Show_Playing && UIShowAni != null)
-            {
-                UIShowAni.Stop();
-                mUI_Ani_Show_Playing = false;
-            }
-        }
-
-        public void TryPlayExitAni()
-        {
-            if (mUI_Ani_Show_Playing && UIShowAni != null)
-            {
-                UIShowAni.Stop();
-                mUI_Ani_Show_Playing = false;
-            }
-
-            if (UIExitAni != null && !mUI_Ani_Exit_Playing)
-            {
-                mUI_Ani_Exit_Playing = true;
-                UIExitAni.onFinish.RemoveListener(OnExitUIAniFinish);
-                UIExitAni.onFinish.AddListener(OnExitUIAniFinish);
-                UIExitAni.Play();
-            }
-        }
-
-        private void OnShowUIAniFinish()
-        {
-            mUI_Ani_Show_Playing = false;
-            this.SendMsg(UIEventConst.ShowUIAnimationFinish);
-        }
-
-        private void OnExitUIAniFinish()
-        {
-            mUI_Ani_Exit_Playing = false;
+            this.OnDestroyUI?.Invoke();
+            var emmList = this.OnDestroyUI.GetInvocationList();
+            this.OnDestroyUIEvent?.Invoke();
+            //OnCloseUI?.Invoke();
         }
 
     }

@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEditor;
+﻿using System.Linq;
 using TinaX.UIKit;
 using TinaX.XComponent;
-using TinaX.UIKit.Animation;
 using TinaXEditor.Utils;
-using UnityEngine.Rendering;
+using UnityEditor;
+using UnityEngine;
 
 namespace TinaXEditor.UIKit
 {
@@ -22,8 +18,13 @@ namespace TinaXEditor.UIKit
         private SerializedProperty _screenUI;
         private SerializedProperty _allowMultiple;
         private SerializedProperty _sortingLayer;
-        private SerializedProperty _uiShowAni;
-        private SerializedProperty _uiExitAni;
+
+        private bool _events_foldout = false;
+        private SerializedProperty _event_OpenUI;
+        private SerializedProperty _event_ShowUI;
+        private SerializedProperty _event_HideUI;
+        private SerializedProperty _event_CloseUI;
+        private SerializedProperty _event_DestroyUI;
 
         public override void OnInspectorGUI()
         {
@@ -129,29 +130,60 @@ namespace TinaXEditor.UIKit
 
             EditorGUILayout.EndHorizontal();
 
-            //动画-----------------------------------------------------------------------
+            //UI事件----------------------------------------------------------------------
             GUILayout.Space(10);
-            EditorGUILayout.LabelField("UI Animation", EditorStyles.largeLabel);
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent(I18Ns.UIShow_Ani), GUILayout.MaxWidth(120));
-            if (_uiShowAni == null && _target_seriablizedObj != null)
-                _uiShowAni = _target_seriablizedObj.FindProperty("UIShowAni");
-            EditorGUILayout.PropertyField(_uiShowAni, GUIContent.none);
+            //EditorGUILayout.LabelField(EditorGUIUtil.IsCmnHans ? "UI页面事件" : "UI Page Events", EditorStyles.largeLabel);
+            _events_foldout = EditorGUILayout.Foldout(_events_foldout, EditorGUIUtil.IsCmnHans ? "UI页面事件" : "UI Page Events");
+            if (_events_foldout)
+            {
+                EditorGUILayout.BeginVertical();
+                if (_event_OpenUI == null && _target_seriablizedObj != null)
+                    _event_OpenUI = _target_seriablizedObj.FindProperty("OnOpenUIEvent");
+                EditorGUILayout.PropertyField(_event_OpenUI);
+
+                if (_event_ShowUI == null && _target_seriablizedObj != null)
+                    _event_ShowUI = _target_seriablizedObj.FindProperty("OnShowUIEvent");
+                EditorGUILayout.PropertyField(_event_ShowUI);
+
+                if (_event_HideUI == null && _target_seriablizedObj != null)
+                    _event_HideUI = _target_seriablizedObj.FindProperty("OnHideUIEvent");
+                EditorGUILayout.PropertyField(_event_HideUI);
+
+                if (_event_CloseUI == null && _target_seriablizedObj != null)
+                    _event_CloseUI = _target_seriablizedObj.FindProperty("OnCloseUIEvent");
+                EditorGUILayout.PropertyField(_event_CloseUI);
+
+                if (_event_DestroyUI == null && _target_seriablizedObj != null)
+                    _event_DestroyUI = _target_seriablizedObj.FindProperty("OnDestroyUIEvent");
+                EditorGUILayout.PropertyField(_event_DestroyUI);
+
+                EditorGUILayout.EndVertical();
+            }
+            
+
+            //动画-----------------------------------------------------------------------
+            //GUILayout.Space(10);
+            //EditorGUILayout.LabelField("UI Animation", EditorStyles.largeLabel);
+            //EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField(new GUIContent(I18Ns.UIShow_Ani), GUILayout.MaxWidth(120));
+            //if (_uiShowAni == null && _target_seriablizedObj != null)
+            //    _uiShowAni = _target_seriablizedObj.FindProperty("UIShowAni");
+            //EditorGUILayout.PropertyField(_uiShowAni, GUIContent.none);
 
             //_target.UIShowAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIShowAni,typeof(UIAnimationBase),true);
-            EditorGUILayout.EndHorizontal();
-            if (_uiShowAni.objectReferenceValue != null)
-                ((UIAnimationBase)_uiShowAni.objectReferenceValue).playOnAwake = false;
+            //EditorGUILayout.EndHorizontal();
+            //if (_uiShowAni.objectReferenceValue != null)
+            //    ((UIAnimationBase)_uiShowAni.objectReferenceValue).playOnAwake = false;
 
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(new GUIContent(I18Ns.UIExit_Ani), GUILayout.MaxWidth(120));
-            if (_uiExitAni == null && _target_seriablizedObj != null)
-                _uiExitAni = _target_seriablizedObj.FindProperty("UIExitAni");
-            EditorGUILayout.PropertyField(_uiExitAni, GUIContent.none);
+            //EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField(new GUIContent(I18Ns.UIExit_Ani), GUILayout.MaxWidth(120));
+            //if (_uiExitAni == null && _target_seriablizedObj != null)
+            //    _uiExitAni = _target_seriablizedObj.FindProperty("UIExitAni");
+            //EditorGUILayout.PropertyField(_uiExitAni, GUIContent.none);
             //_target.UIExitAni = (UIAnimationBase)EditorGUILayout.ObjectField(_target.UIExitAni, typeof(UIAnimationBase), true);
-            EditorGUILayout.EndHorizontal();
-            if (_uiExitAni.objectReferenceValue != null)
-                ((UIAnimationBase)_uiExitAni.objectReferenceValue).pingPong = false;
+            //EditorGUILayout.EndHorizontal();
+            //if (_uiExitAni.objectReferenceValue != null)
+            //    ((UIAnimationBase)_uiExitAni.objectReferenceValue).pingPong = false;
             //if (_target.UIExitAni != null)
             //    _target.UIExitAni.pingPong = false;
 
@@ -305,15 +337,27 @@ namespace TinaXEditor.UIKit
                 }
             }
 
-            public static string UIShow_Ani
+            //public static string UIShow_Ani
+            //{
+            //    get
+            //    {
+            //        if (IsChinese)
+            //            return "UI显示动画";
+            //        if (NihongoDesuka)
+            //            return "UI表示アニメーション";
+            //        return "UI Show Animation";
+            //    }
+            //}
+
+            public static string Event_ShowUI
             {
                 get
                 {
                     if (IsChinese)
-                        return "UI显示动画";
+                        return "UI页显示";
                     if (NihongoDesuka)
-                        return "UI表示アニメーション";
-                    return "UI Show Animation";
+                        return "UIページを表示する";
+                    return "Show UI Page";
                 }
             }
 

@@ -52,8 +52,8 @@ namespace TinaX.UIKit.Components
             if (_target_btn.IsInteractable() && (eventData.button != PointerEventData.InputButton.Middle && eventData.button != PointerEventData.InputButton.Right))
             {
                 //down 相关
-                if (DownAnimation != null)
-                    DownAnimation.Play();
+                //if (DownAnimation != null)
+                //    DownAnimation.Play();
                 if (OnDown != null)
                     OnDown.Invoke();
 
