@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using TinaX.UIKit.Animation;
+//using TinaX.UIKit.Animation;
 
 namespace TinaX.UIKit.Components
 {
@@ -16,6 +17,9 @@ namespace TinaX.UIKit.Components
         [Space(10)]
         public UnityEvent OnEnter = new UnityEvent();
         public UnityEvent OnExit = new UnityEvent();
+
+        public Action OnEnterAction { get; set; }
+        public Action OnExitAction { get; set; }
         
 
         public void OnPointerEnter(PointerEventData eventData)

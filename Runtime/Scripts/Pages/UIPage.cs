@@ -1,9 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TinaX.XComponent;
 using System;
-using TinaX.UIKit.Animation;
+//using TinaX.UIKit.Animation;
 using System.Linq;
 using TinaX.UIKit.UnityEvents;
 

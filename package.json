@@ -21,6 +21,6 @@
   "dependencies": {
     "io.nekonya.tinax.core":"6.6.10",
     "com.neuecc.unirx": "7.1.0",
-    "io.nekonya.tinax.xcomponent":"6.6.3"
+    "io.nekonya.tinax.xcomponent":"6.6.4"
   }
 }

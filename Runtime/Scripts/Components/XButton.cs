@@ -1,8 +1,10 @@
-﻿using TinaX.UIKit.Animation;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UniRx;
+using TinaX.Systems;
 
 namespace TinaX.UIKit.Components
 {
@@ -15,10 +17,10 @@ namespace TinaX.UIKit.Components
         public float LongTapTime = 1.5f;
 
         #region Ani
-        [Space(10)]
-        public UIAnimationBase ClickAnimation;
-        public UIAnimationBase DownAnimation;
-        public UIAnimationBase LongTapAnimation;
+        //[Space(10)]
+        //public UIAnimationBase ClickAnimation;
+        //public UIAnimationBase DownAnimation;
+        //public UIAnimationBase LongTapAnimation;
         #endregion
 
         #region Events
@@ -32,7 +34,12 @@ namespace TinaX.UIKit.Components
         public UnityEvent onClick => this.OnClick; //兼容Unity风格的小驼峰
         #endregion
 
+        public Action OnClickAction { get; set; }
+        public Action OnDownAction { get; set; }
+        public Action OnLongTapAction { get; set; }
+
         private Button _target_btn;
+
 
         private void Awake()
         {
@@ -52,14 +59,15 @@ namespace TinaX.UIKit.Components
             if (_target_btn.IsInteractable() && (eventData.button != PointerEventData.InputButton.Middle && eventData.button != PointerEventData.InputButton.Right))
             {
                 //down 相关
-                //if (DownAnimation != null)
-                //    DownAnimation.Play();
+                
                 if (OnDown != null)
                     OnDown.Invoke();
+                OnDownAction?.Invoke();
 
                 //long tap 相关
                 if(this.LongTapTime > 0)
                 {
+                    
                 }
             }
         }
@@ -72,6 +80,7 @@ namespace TinaX.UIKit.Components
         {
             if (this.OnClick != null)
                 this.OnClick.Invoke();
+            this.OnClickAction?.Invoke();
         }
 
         

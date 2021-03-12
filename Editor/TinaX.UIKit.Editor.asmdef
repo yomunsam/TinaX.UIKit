@@ -1,5 +1,6 @@
 {
     "name": "TinaX.UIKit.Editor",
+    "rootNamespace": "TinaXEditor.UIKit",
     "references": [
         "GUID:2b2b84db2356fe84d9158fa418cdac5e",
         "GUID:9db5e326baf15604fb41b0ba171e2039",
