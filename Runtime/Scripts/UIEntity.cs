@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinaX.UIKit.Internal;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -139,24 +140,47 @@ namespace TinaX.UIKit.Entity
         public void Dispose()
 #pragma warning restore CA1063 // Implement IDisposable Correctly
         {
+            if (UIStatue == UIStatus.Unloaded)
+                return;
+
             UIStatue = UIStatus.Unloaded;
+            var destroy_delay = this.UIPage.DestroyDelay;
             if (UIGameObject != null)
             {
                 //触发CloseUI事件
                 this.UIPage.OnCloseUIEvent?.Invoke();
-                this.UIPage.OnCloseUI?.Invoke(this.UIPage.DestroyDelay);
+                this.UIPage.OnCloseUI?.Invoke(destroy_delay);
 
 
-                UIGameObject.Destroy(this.UIPage.DestroyDelay);
+                UIGameObject.Destroy(destroy_delay);
                 UIGameObject = null;
             }
             if(UIPrefab != null)
             {
                 if(XCore.GetMainInstance().Services.TryGetBuildInService<TinaX.Services.IAssetService>(out var assets))
                 {
-                    assets.Release(UIPrefab);
+                    if (this.UIPage.DestroyDelay > 0)
+                    {
+                        Observable.NextFrame()
+                            .Delay(TimeSpan.FromSeconds(destroy_delay))
+                            .Subscribe(_ =>
+                            {
+                                assets.Release(UIPrefab);
+                                UIPrefab = null;
+                            });
+                    }
+                    else
+                    {
+                        assets.Release(UIPrefab);
+                        UIPrefab = null;
+                    }
                 }
-                UIPrefab = null;
+                else
+                {
+                    Debug.LogError("[UIEntity]Connot get build-in service : " + nameof(TinaX.Services.IAssetService));
+                    UIPrefab = null;
+                }
+
             }
             UICanvas = null;
             UIPage = null;
