@@ -71,8 +71,12 @@ namespace TinaX.UIKit
 
 
         
-
-        public void TrySetXBehavior(XComponent.XBehaviour xBehaviour, bool inject = true)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xBehaviour"></param>
+        /// <param name="inject_bindings"></param>
+        public void TrySetXBehavior(XComponent.XBehaviour xBehaviour, bool inject_bindings = true)
         {
             if(UIMainHandler != null)
             {
@@ -81,7 +85,7 @@ namespace TinaX.UIKit
                     var xcomponent = UIMainHandler as TinaX.XComponent.XComponent;
                     if(xcomponent.Behaviour == null)
                     {
-                        xcomponent.AddBehaviour(xBehaviour, inject);
+                        xcomponent.AddBehaviour(xBehaviour, inject_bindings);
                     }
                 }
             }

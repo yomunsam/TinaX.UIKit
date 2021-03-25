@@ -18,7 +18,7 @@ namespace TinaX.UIKit.Entity
         public string UIPath;
         public UIStatus UIStatue = UIStatus.Idle;
 
-        public Task OpenUITask = Task.CompletedTask;
+        public Task LoadUIPrefabTask = Task.CompletedTask;
 
         private UIPage _uiPage;
         public UIPage UIPage

@@ -14,6 +14,7 @@ using TinaX.XComponent;
 using UniRx;
 using TinaX.UIKit.Pipelines.OpenUI;
 using TinaX.Systems.Pipeline;
+using Cysharp.Threading.Tasks;
 
 namespace TinaX.UIKit
 {
@@ -21,6 +22,9 @@ namespace TinaX.UIKit
     {
         [Inject]
         public IAssetService Assets { get; set; }
+
+        [Inject]
+        public IXCore m_Core { get; set; }
 
         private UIConfig mConfig;
 
@@ -501,7 +505,7 @@ namespace TinaX.UIKit
 
                     if(entities[0].UIStatue == UIStatus.Loading)
                     {
-                        await entities[0].OpenUITask;
+                        await entities[0].LoadUIPrefabTask;
                         if (!entities[0].AllowMultiple)
                         {
                             setTop(entities[0]);
@@ -513,10 +517,10 @@ namespace TinaX.UIKit
 
             //除了上面两种情况，其他都得重新加载
             UIEntity entity = new UIEntity(this, uiName, uiPath);
-            entity.OpenUITask = doOpenUIAsync(entity, ui_root, xBehaviour, inject, UseMask, CloseByMask, maskColor, args);
+            entity.LoadUIPrefabTask = doOpenUIAsync(entity, ui_root, xBehaviour, inject, UseMask, CloseByMask, maskColor, args);
             this.UIEntities.Register(entity);
 
-            await entity.OpenUITask;
+            await entity.LoadUIPrefabTask;
 
             return entity;
         }
@@ -660,7 +664,7 @@ namespace TinaX.UIKit
                 entity.UIPage.SendOpenUIMessage(args);
             }
             entity.UIStatue = UIStatus.Loaded;
-            entity.OpenUITask = Task.CompletedTask;
+            entity.LoadUIPrefabTask = Task.CompletedTask;
         }
 
         private UIEntity openUI(string uiPath, string uiName, Transform ui_root, XComponent.XBehaviour xBehaviour, bool inject, bool UseMask, bool CloseByMask, Color maskColor, params object[] args)
@@ -763,7 +767,7 @@ namespace TinaX.UIKit
                 entity.UIPage.SendOpenUIMessage(args);
             }
             entity.UIStatue = UIStatus.Loaded;
-            entity.OpenUITask = Task.CompletedTask;
+            entity.LoadUIPrefabTask = Task.CompletedTask;
 
             this.UIEntities.Register(entity);
             return entity;
@@ -858,7 +862,7 @@ namespace TinaX.UIKit
             pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.GetUILoadPath, (payload, next) =>
             {
 #if TINAX_DEBUG_DEV
-                Debug.Log("[UIKIT]进入处理LoadPath的流程");
+                Debug.Log("[UIKIT]进入处理LoadPath的Pipeline流程");
 #endif
                 switch (mUINameMode)
                 {
@@ -889,6 +893,9 @@ namespace TinaX.UIKit
             //检查是否已加载 (检查是否已经打开UI, 如果UI已经打开了，并且该UI设置不允许打开多个的话，则把已存在的UI置顶，并不再加载
             pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.CheckLoaded, async (payload, next) =>
             {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]进入判断是否重复加载的Pipeline流程");
+#endif
                 void setTop(UIEntity __entity)
                 {
                     //置顶
@@ -903,16 +910,19 @@ namespace TinaX.UIKit
                         if(entities[0].UIStatue == UIStatus.Loaded && !entities[0].AllowMultiple)
                         {
                             payload.UIEntity = entities[0];
+                            await UniTask.NextFrame();
                             setTop(payload.UIEntity);
+                            await UniTask.NextFrame();
                             return false; //中断后续操作
                         }
 
                         if(entities[0].UIStatue == UIStatus.Loading)
                         {
-                            await entities[0].OpenUITask;
+                            await entities[0].LoadUIPrefabTask;
                             if (!entities[0].AllowMultiple)
                             {
                                 payload.UIEntity = entities[0];
+                                await UniTask.NextFrame();
                                 setTop(payload.UIEntity);
                                 return false; //中断后续操作
                             } //否则继续加载这个UI
@@ -923,6 +933,113 @@ namespace TinaX.UIKit
                 return true;
             }));
 
+            //创建UIEntity的流程
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.CreateUIEntity, (payload, next) =>
+            {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]进入创建UIEntity的Pipeline流程");
+#endif
+                payload.UIEntity = new UIEntity(this, payload.UIName, payload.UILoadPath);
+                payload.UIEntity.LoadUIPrefabTask = DoLoadUIPrefabAsync(payload.UIEntity);
+                this.UIEntities.Register(payload.UIEntity);
+
+                return Task.FromResult(true);
+            }));
+
+            //加载Prefab的流程
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.LoadPrefab, async (payload, next) =>
+            {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]进入加载UI Prefab的Pipeline流程");
+#endif
+                if(payload.UIEntity.UIPrefab == null)
+                {
+                    await payload.UIEntity.LoadUIPrefabTask;
+                }
+
+                return true;
+            }));
+
+            //从prefab到GameObject的流程
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.Instantiates, (payload, next) =>
+            {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]进入从UI prefab 到 GameObject的Pipeline流程");
+#endif
+                var uiPage = payload.UIEntity.UIPrefab.GetComponent<UIPage>();
+                if (uiPage == null)
+                {
+                    string ui_name = payload.UIName;
+                    Assets.Release(payload.UIEntity.UIPrefab);
+                    payload.UIEntity.UIPrefab = null;
+                    throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"无法打开UI \"{ui_name}\" , 这不是一个有效的UI页文件。" : $"Unable to open UI \"{ui_name}\", this is not a valid UI Page file."), UIKitErrorCode.InvalidUIPage);
+                }
+
+                if (uiPage.ScreenUI)
+                {
+                    Transform trans_UIRoot = getScreenUIRoot(uiPage.SortingLayerId);
+                    payload.UIEntity.UIGameObject = UnityEngine.GameObject.Instantiate(payload.UIEntity.UIPrefab, trans_UIRoot);
+                    if (payload.UIEntity.UIGameObject.name.Length > 7)
+                        payload.UIEntity.UIGameObject.Name(payload.UIEntity.UIGameObject.name.Substring(0, payload.UIEntity.UIGameObject.name.Length - 7));
+                }
+                else
+                {
+                    //非ScreenUI, 在指定的UIRoot下创建GameObject
+                    payload.UIEntity.UIGameObject = UnityEngine.GameObject.Instantiate(payload.UIEntity.UIPrefab, payload.UIRoot);
+                    if (payload.UIEntity.UIGameObject.name.Length > 7)
+                        payload.UIEntity.UIGameObject.Name(payload.UIEntity.UIGameObject.name.Substring(0, payload.UIEntity.UIGameObject.name.Length - 7));
+                }
+
+                payload.UIEntity.UIPage = payload.UIEntity.UIGameObject.GetComponent<UIPage>();
+                payload.UIEntity.UICanvas = payload.UIEntity.UIGameObject.GetComponentOrAdd<Canvas>();
+
+                if (payload.UIEntity.UIPage.ScreenUI)
+                {
+                    payload.UIEntity.UICanvas.overrideSorting = true;
+                    payload.UIEntity.UICanvas.sortingLayerID = payload.UIEntity.UIPage.SortingLayerId;
+
+                    //UI层级
+                    if (!mDict_UILayers.ContainsKey(payload.UIEntity.SortingLayerId))
+                        mDict_UILayers.Add(payload.UIEntity.SortingLayerId, new UILayerManager());
+                    mDict_UILayers[payload.UIEntity.SortingLayerId].Register(payload.UIEntity);
+                }
+
+                return Task.FromResult(true);
+            }));
+
+            //xBehaviour，处理UI Main Handler为xBehaviour的情况
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.Instantiates, (payload, next) =>
+            {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]pipeline处理UI Main Handler是xBehaviour的情况");
+#endif
+                if(payload.xBehaviour != null)
+                {
+                    if (payload.DependencyInjection)
+                        m_Core.Services.Inject(payload.xBehaviour);
+                    if(payload.xBehaviour is XUIBehaviour)
+                    {
+                        var uiBehaviour = payload.xBehaviour as XUIBehaviour;
+                        uiBehaviour.UIEntity = payload.UIEntity;
+                    }
+                    payload.UIEntity.UIPage.TrySetXBehavior(payload.xBehaviour, payload.DependencyInjection);
+                }
+
+                return Task.FromResult(true);
+            }));
+
+        }
+
+        /// <summary>
+        /// 执行加载UIPrefab的方法
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+
+        private async Task DoLoadUIPrefabAsync(UIEntity entity)
+        {
+            var prefab = await this.Assets.LoadAsync<GameObject>(entity.UIPath);
+            entity.UIPrefab = prefab;
         }
 
 
