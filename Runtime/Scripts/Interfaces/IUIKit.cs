@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Entity;
+using TinaX.UIKit.Pipelines.OpenUI;
 using TinaX.XComponent;
 using UnityEngine;
 
@@ -12,6 +14,7 @@ namespace TinaX.UIKit
     public interface IUIKit
     {
         Camera UICamera { get; }
+        XPipeline<IOpenUIAsyncHandler> OpenUIAsyncPipeline { get; }
 
         void CloseUI(UIEntity entity, params object[] args);
         void CloseUI(string UIName, params object[] args);

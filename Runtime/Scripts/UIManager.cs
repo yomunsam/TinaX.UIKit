@@ -12,6 +12,8 @@ using UnityEngine.UI;
 using TinaX.UIKit.Entity;
 using TinaX.XComponent;
 using UniRx;
+using TinaX.UIKit.Pipelines.OpenUI;
+using TinaX.Systems.Pipeline;
 
 namespace TinaX.UIKit
 {
@@ -41,7 +43,19 @@ namespace TinaX.UIKit
 
         private UIEntityManager UIEntities = new UIEntityManager();
 
+        #region Pipelines
+
+        /// <summary>
+        /// 执行“异步打开UI”流程时候的管线
+        /// </summary>
+        private XPipeline<IOpenUIAsyncHandler> m_OpenUIAsyncPipeline = new XPipeline<IOpenUIAsyncHandler>();
+
+
+        #endregion
+
         public Camera UICamera => mScreenUICamera;
+
+        public XPipeline<IOpenUIAsyncHandler> OpenUIAsyncPipeline => m_OpenUIAsyncPipeline;
 
         public async Task<XException> Start()
         {
@@ -117,6 +131,9 @@ namespace TinaX.UIKit
 #endif
 
             #endregion
+
+            //Pipelines 初始化
+            this.OpenUIAsyncConfigure(ref m_OpenUIAsyncPipeline);
 
             await Task.Yield();
             return null;
@@ -238,25 +255,33 @@ namespace TinaX.UIKit
                 args);
         }
 
+        //public async Task<IUIEntity> OpenUIAsync(string UIName, XBehaviour behaviour, params object[] args)
+        //{
+        //    string ui_path = null;
+        //    if (mUINameMode == UINameMode.UIGroup)
+        //    {
+        //        if (mCurUIGroup != null)
+        //        {
+        //            if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
+        //                throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
+        //        }
+        //    }
+        //    else
+        //        ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
+
+        //    if (ui_path.IsNullOrEmpty())
+        //        throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+
+
+        //    var entity = await openUIAsync(ui_path, UIName, null, behaviour, true, false, false, default, args);
+        //    return entity;
+        //}
+
         public async Task<IUIEntity> OpenUIAsync(string UIName, XBehaviour behaviour, params object[] args)
         {
-            string ui_path = null;
-            if (mUINameMode == UINameMode.UIGroup)
-            {
-                if (mCurUIGroup != null)
-                {
-                    if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
-                        throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
-                }
-            }
-            else
-                ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
+            //尝试基于Pipeline的新写法
 
-            if (ui_path.IsNullOrEmpty())
-                throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
-
-
-            var entity = await openUIAsync(ui_path, UIName, null, behaviour, true, false, false, default, args);
+            var entity = await _PipelineOpenUIAsync(uiName: UIName, useMask: false, closeByMask: false, maskColor: null, uiRoot: null, xBehaviour: behaviour, DI: true, openUIParam: null, args);
             return entity;
         }
 
@@ -494,6 +519,64 @@ namespace TinaX.UIKit
             await entity.OpenUITask;
 
             return entity;
+        }
+
+        /// <summary>
+        /// [新] Pipeline实现版本私有方法总入口
+        /// </summary>
+        /// <param name="uiName"></param>
+        /// <param name="useMask"></param>
+        /// <param name="closeByMask"></param>
+        /// <param name="maskColor"></param>
+        /// <param name="uiRoot"></param>
+        /// <param name="xBehaviour"></param>
+        /// <param name="DI">启用依赖注入</param>
+        /// <param name="openUIParam"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private async Task<UIEntity> _PipelineOpenUIAsync(string uiName, //广义上的UIName, 可能是UI Group里的Name,也有可能是别的命名方式定义的UI Name，甚至直接是路径
+            bool useMask,
+            bool closeByMask,
+            Color? maskColor,
+            Transform uiRoot,
+            XBehaviour xBehaviour,
+            bool DI,
+            OpenUIParam openUIParam,
+            object[] args)
+        {
+            OpenUIPayload payload = new OpenUIPayload(); 
+            if(openUIParam != null) //openUIParam里的参数优先级大于零散参数
+            {
+                //要是Unity有AutoMapper用就好了, 先手动抄一遍吧，以后想想看有啥好方法优化一下
+                payload.UIName = openUIParam.UIName;
+                payload.UseMask = openUIParam.UseMask;
+                payload.CloseByMask = openUIParam.CloseByMask;
+                payload.MaskColor = openUIParam.MaskColor;
+                payload.UIRoot = openUIParam.UIRoot;
+                payload.xBehaviour = openUIParam.xBehaviour;
+                payload.DependencyInjection = openUIParam.DependencyInjection;
+            }
+            else
+            {
+                payload.UIName = uiName;
+                payload.UseMask = useMask;
+                payload.CloseByMask = closeByMask;
+                payload.MaskColor = maskColor;
+                payload.UIRoot = uiRoot;
+                payload.xBehaviour = xBehaviour;
+                payload.DependencyInjection = DI;
+            }
+
+            payload.OpenUIArgs = args;
+
+            //挨个跑一下Pipeline
+            await m_OpenUIAsyncPipeline.StartAsync((handler, next) =>
+            {
+                return handler.OpenUIAsync(payload, next);
+            });
+
+            //然后照理说，Pipeline中会把payload里的UIEntity赋值，我们就不用管了
+            return payload.UIEntity;
         }
 
         /// <summary>
@@ -765,6 +848,82 @@ namespace TinaX.UIKit
             }
         }
 
+        /// <summary>
+        /// 配置“异步打开UI”的管线内容
+        /// </summary>
+        /// <param name="pipeline"></param>
+        private void OpenUIAsyncConfigure(ref XPipeline<IOpenUIAsyncHandler> pipeline)
+        {
+            //处理UILoadPath
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.GetUILoadPath, (payload, next) =>
+            {
+#if TINAX_DEBUG_DEV
+                Debug.Log("[UIKIT]进入处理LoadPath的流程");
+#endif
+                switch (mUINameMode)
+                {
+                    case UINameMode.UIGroup:
+                        if (mCurUIGroup != null)
+                        {
+                            if (mCurUIGroup.TryGetPath(payload.UIName, out var _loadpath))
+                                payload.UILoadPath = _loadpath;
+                            else
+                                throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + payload.UIName, UIKitErrorCode.InvalidUIName);
+                        }
+                        else
+                            throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"无效的设置，UI组为空" : $"Invalid configuration: UI Group is empty."), UIKitErrorCode.InvalidUIGroup);
+
+                        break;
+
+                    case UINameMode.RelativeDirectory:
+                        payload.UILoadPath = (mUIRootDirLoadPath.IsNullOrEmpty()) ? payload.UIName : mUIRootDirLoadPath_withSlash + payload.UIName;
+                        break;
+                }
+
+                if (payload.UILoadPath.IsNullOrEmpty())
+                    throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{payload.UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{payload.UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+
+                return Task.FromResult<bool>(true);
+            }));
+
+            //检查是否已加载 (检查是否已经打开UI, 如果UI已经打开了，并且该UI设置不允许打开多个的话，则把已存在的UI置顶，并不再加载
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.CheckLoaded, async (payload, next) =>
+            {
+                void setTop(UIEntity __entity)
+                {
+                    //置顶
+                    if (mDict_UILayers.TryGetValue(__entity.SortingLayerValue, out var layer))
+                        layer.Top(__entity);
+                }
+
+                if (this.UIEntities.TryGetEntitys(payload.UILoadPath, out var entities))
+                {
+                    if(entities.Length > 0)
+                    {
+                        if(entities[0].UIStatue == UIStatus.Loaded && !entities[0].AllowMultiple)
+                        {
+                            payload.UIEntity = entities[0];
+                            setTop(payload.UIEntity);
+                            return false; //中断后续操作
+                        }
+
+                        if(entities[0].UIStatue == UIStatus.Loading)
+                        {
+                            await entities[0].OpenUITask;
+                            if (!entities[0].AllowMultiple)
+                            {
+                                payload.UIEntity = entities[0];
+                                setTop(payload.UIEntity);
+                                return false; //中断后续操作
+                            } //否则继续加载这个UI
+                        }
+                    }
+                }
+
+                return true;
+            }));
+
+        }
 
 
 

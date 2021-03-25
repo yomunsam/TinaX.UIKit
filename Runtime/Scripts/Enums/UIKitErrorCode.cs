@@ -13,5 +13,6 @@ namespace TinaX.UIKit
         InvalidUIName           = 2,
         ConnotGetUIPath         = 3,
         InvalidXBehaviourType   = 4,
+        InvalidUIGroup          = 5,
     }
 }
