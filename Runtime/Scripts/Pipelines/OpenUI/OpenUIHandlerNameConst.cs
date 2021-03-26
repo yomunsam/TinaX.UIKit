@@ -1,4 +1,4 @@
-﻿namespace TinaX.UIKit.Pipelines.OpenUI
+namespace TinaX.UIKit.Pipelines.OpenUI
 {
     /// <summary>
     /// 通过常量定义UIKit内部的OpenUI相关的所有Handler的名字
@@ -34,5 +34,21 @@
         /// 处理UI Main Handler为xBehaviour的情况
         /// </summary>
         public const string XBehaviour = @"xUIKit_xBehaviour";
+
+        /// <summary>
+        /// UI遮罩
+        /// </summary>
+        public const string UIMask = @"xUIKit_UIMask";
+
+        /// <summary>
+        /// 发送打开UI事件
+        /// </summary>
+        public const string SendMessage = @"xUIKit_SendMessage";
+
+
+        /// <summary>
+        /// 收尾工作
+        /// </summary>
+        public const string Finish = @"xUIKit_Finish";
     }
 }

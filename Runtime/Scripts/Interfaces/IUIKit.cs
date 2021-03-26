@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,7 @@ namespace TinaX.UIKit
     {
         Camera UICamera { get; }
         XPipeline<IOpenUIAsyncHandler> OpenUIAsyncPipeline { get; }
+        XPipeline<IOpenUIHandler> OpenUIPipeline { get; }
 
         void CloseUI(UIEntity entity, params object[] args);
         void CloseUI(string UIName, params object[] args);
