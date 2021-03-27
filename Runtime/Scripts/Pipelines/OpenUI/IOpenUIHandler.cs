@@ -2,7 +2,7 @@ namespace TinaX.UIKit.Pipelines.OpenUI
 {
     public interface IOpenUIHandler
     {
-        public string HandlerName { get; }
+        string HandlerName { get; }
 
         /// <summary>
         /// 执行加载管线中的内容
