@@ -25,6 +25,14 @@ namespace TinaX.UIKit
             xImage.SetSpritePathAsync(loadPath, callback);
         }
 
+        public static void ClearLoadedSprite(this Image image)
+        {
+            var xImage = image.GetComponent<XImage>();
+            if (xImage == null)
+                return;
+            xImage.ClearLoadedSprite();
+        }
+
 
         private static XImage _GetXImageOrCreate(ref Image image)
         {
@@ -35,5 +43,6 @@ namespace TinaX.UIKit
             }
             return ximg;
         }
+
     }
 }

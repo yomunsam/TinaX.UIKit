@@ -12,6 +12,8 @@ namespace TinaX.UIKit.Components
     [RequireComponent(typeof(Image))]
     public class XImage : XUIComponent
     {
+        public Sprite sprite => m_Target.sprite;
+
         private Image m_Target;
 
         private Sprite m_LastLoadAsset; //最后一次加载的资产
@@ -100,6 +102,13 @@ namespace TinaX.UIKit.Components
                     else
                         throw err;
                 });
+        }
+
+        public void ClearLoadedSprite()
+        {
+            if (m_LastLoadAsset != null)
+                m_Assets.Release(m_LastLoadAsset);
+            m_LastLoadAsset = null;
         }
 
     }
