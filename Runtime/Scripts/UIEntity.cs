@@ -53,6 +53,8 @@ namespace TinaX.UIKit.Entity
         public int SortingLayerId => this.UIPage.SortingLayerId;
         public bool AllowMultiple => this.UIPage.AllowMultiple;
 
+        public bool Closed => this.UIStatue == UIStatus.Unloaded;
+
         private GameObject mGo_Mask;
         private Canvas mCanvas_Mask;
         private bool mMaskSmartClose; //click mask to close ui
@@ -69,6 +71,8 @@ namespace TinaX.UIKit.Entity
 
         public void Show()
         {
+            if (Closed)
+                return;
             if (this.UIGameObject != null)
                 this.UIGameObject.Show();
             if (this.mGo_Mask != null)
@@ -77,6 +81,8 @@ namespace TinaX.UIKit.Entity
 
         public void Hide()
         {
+            if (Closed)
+                return;
             if (this.UIGameObject != null)
                 this.UIGameObject.Hide();
             if (this.mGo_Mask != null)
@@ -85,6 +91,8 @@ namespace TinaX.UIKit.Entity
 
         public void Close(params object[] args)
         {
+            if (Closed)
+                return;
             this.UIMgr?.CloseUI(this, args);
         }
 

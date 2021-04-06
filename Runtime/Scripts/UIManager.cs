@@ -373,7 +373,10 @@ namespace TinaX.UIKit
 
         public void CloseUI(UIEntity entity , params object[] args)
         {
-            if (entity == null) return;
+            if (entity == null) 
+                return;
+            if (entity.Closed)
+                return;
             this.closeUI(entity, args);
         }
 
