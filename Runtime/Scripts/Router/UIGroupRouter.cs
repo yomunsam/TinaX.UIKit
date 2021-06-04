@@ -15,10 +15,7 @@ namespace TinaX.UIKit.Router
         {
             if(m_Group != null)
             {
-                if (m_Group.TryGetPath(uiName, out uiLoadPath))
-                    return true;
-                else
-                    return false;
+                return m_Group.TryGetPath(uiName, out uiLoadPath);
             }
             else
             {
