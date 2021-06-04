@@ -1,20 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using TinaX;
+using Cysharp.Threading.Tasks;
 using TinaX.Services;
-using TinaX.UIKit.Internal;
+using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Const;
-using UnityEngine.UI;
 using TinaX.UIKit.Entity;
+using TinaX.UIKit.Internal;
+using TinaX.UIKit.Pipelines.OpenUI;
+using TinaX.UIKit.Router;
 using TinaX.XComponent;
 using UniRx;
-using TinaX.UIKit.Pipelines.OpenUI;
-using TinaX.Systems.Pipeline;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace TinaX.UIKit
 {
@@ -28,10 +27,15 @@ namespace TinaX.UIKit
 
         private UIConfig mConfig;
 
-        private UIGroup mCurUIGroup;
-        private UINameMode mUINameMode;
-        private string mUIRootDirLoadPath;
-        private string mUIRootDirLoadPath_withSlash;
+        //private UIGroup mCurUIGroup;
+        //private UINameMode mUINameMode;
+        //private string mUIRootDirLoadPath;
+        //private string mUIRootDirLoadPath_withSlash;
+
+        /// <summary>
+        /// UIName到加载地址的路由接口
+        /// </summary>
+        private IRouter m_Router;
 
         private bool mInited = false;
 
@@ -84,21 +88,37 @@ namespace TinaX.UIKit
 
             if (!mConfig.EnableUIKit) return null;
 
-            if (mConfig.UINameMode == UINameMode.UIGroup)
-                mCurUIGroup = mConfig.DefaultUIGroup;
-            else
+            if(!m_Core.Services.TryGet<IRouter>(out m_Router))
             {
-                mUIRootDirLoadPath = mConfig.UIRootDirectoryLoadPath;
-                if (!mUIRootDirLoadPath.IsNullOrEmpty())
+                //没有发现开发者外部注入的路由，所以使用内置路由
+                switch (mConfig.UINameMode)
                 {
-                    if (mUIRootDirLoadPath.EndsWith("/"))
-                        mUIRootDirLoadPath = mUIRootDirLoadPath.Substring(0, mUIRootDirLoadPath.Length - 1);
-                    mUIRootDirLoadPath_withSlash = mUIRootDirLoadPath + "/";
+                    default:
+                        throw new UIKitException("Unknow UI Name Mode: " + mConfig.UINameMode.ToString(), UIKitErrorCode.Unknow);
+                    case UINameMode.UIGroup:
+                        m_Router = new UIGroupRouter(mConfig.DefaultUIGroup);
+                        break;
+                    case UINameMode.RelativeDirectory:
+                        m_Router = new RelativeDirectoryRouter(mConfig.UIRootDirectoryLoadPath);
+                        break;
                 }
             }
-            mUINameMode = mConfig.UINameMode;
 
-                #endregion
+            //if (mConfig.UINameMode == UINameMode.UIGroup)
+            //    mCurUIGroup = mConfig.DefaultUIGroup;
+            //else
+            //{
+            //    mUIRootDirLoadPath = mConfig.UIRootDirectoryLoadPath;
+            //    if (!mUIRootDirLoadPath.IsNullOrEmpty())
+            //    {
+            //        if (mUIRootDirLoadPath.EndsWith("/"))
+            //            mUIRootDirLoadPath = mUIRootDirLoadPath.Substring(0, mUIRootDirLoadPath.Length - 1);
+            //        mUIRootDirLoadPath_withSlash = mUIRootDirLoadPath + "/";
+            //    }
+            //}
+            //mUINameMode = mConfig.UINameMode;
+
+            #endregion
 
 
             //Init UIKit GameObjects
@@ -382,33 +402,43 @@ namespace TinaX.UIKit
 
         public void CloseUI(string UIName, params object[] args)
         {
-            string ui_path = null;
-            if (mUINameMode == UINameMode.UIGroup)
-            {
-                if (mCurUIGroup != null)
-                {
-                    if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
-                        throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
-                }
-            }
-            else
-            {
-                ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
-            }
+            //string ui_path = null;
+            //if (mUINameMode == UINameMode.UIGroup)
+            //{
+            //    if (mCurUIGroup != null)
+            //    {
+            //        if (!mCurUIGroup.TryGetPath(UIName, out ui_path))
+            //            throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + UIName, UIKitErrorCode.InvalidUIName);
+            //    }
+            //}
+            //else
+            //{
+            //    ui_path = (mUIRootDirLoadPath.IsNullOrEmpty()) ? UIName : mUIRootDirLoadPath_withSlash + UIName;
+            //}
 
-            if (ui_path.IsNullOrEmpty())
-            {
-                throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
-            }
+            //if (ui_path.IsNullOrEmpty())
+            //{
+            //    throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+            //}
 
-            if(this.UIEntities.TryGetEntitys(ui_path, out var entities))
+            //if(this.UIEntities.TryGetEntitys(ui_path, out var entities))
+            //{
+            //    foreach (var item in entities)
+            //        this.CloseUI(item, args);
+            //}
+
+            var entities = this.UIEntities.FindByUIName(UIName).ToArray();
+            if(entities != null && entities.Length > 0)
             {
-                foreach (var item in entities)
-                    this.CloseUI(item, args);
+                for (var i = entities.Length - 1; i >= 0; i--)
+                    this.closeUI(entities[i], args);
             }
         }
 
-
+        public void SetUIRouter(IRouter router)
+        {
+            m_Router = router ?? throw new ArgumentNullException(nameof(router));
+        }
         
 
         /// <summary>
@@ -603,33 +633,7 @@ namespace TinaX.UIKit
             //处理UILoadPath
             pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.GetUILoadPath, (payload, next) =>
             {
-#if TINAX_DEBUG_DEV
-                Debug.Log("[UIKIT]进入处理LoadPath的Pipeline流程");
-#endif
-                switch (mUINameMode)
-                {
-                    case UINameMode.UIGroup:
-                        if (mCurUIGroup != null)
-                        {
-                            if (mCurUIGroup.TryGetPath(payload.UIName, out var _loadpath))
-                                payload.UILoadPath = _loadpath;
-                            else
-                                throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + payload.UIName, UIKitErrorCode.InvalidUIName);
-                        }
-                        else
-                            throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"无效的设置，UI组为空" : $"Invalid configuration: UI Group is empty."), UIKitErrorCode.InvalidUIGroup);
-
-                        break;
-
-                    case UINameMode.RelativeDirectory:
-                        payload.UILoadPath = (mUIRootDirLoadPath.IsNullOrEmpty()) ? payload.UIName : mUIRootDirLoadPath_withSlash + payload.UIName;
-                        break;
-                }
-
-                if (payload.UILoadPath.IsNullOrEmpty())
-                    throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{payload.UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{payload.UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
-
-                return Task.FromResult<bool>(true);
+                return Task.FromResult<bool>(_Pipeline_Func_GetUILoadPath(payload));
             }));
 
             //检查是否已加载 (检查是否已经打开UI, 如果UI已经打开了，并且该UI设置不允许打开多个的话，则把已存在的UI置顶，并不再加载
@@ -696,9 +700,17 @@ namespace TinaX.UIKit
 #endif
                 if(payload.UIEntity.UIPrefab == null)
                 {
-                    await payload.UIEntity.LoadUIPrefabTask;
+                    try
+                    {
+                        await payload.UIEntity.LoadUIPrefabTask;
+                    }
+                    catch(Exception e)
+                    {
+                        Debug.LogException(e);
+                        return false;
+                    }
                 }
-
+                
                 return true;
             }));
 
@@ -821,33 +833,7 @@ namespace TinaX.UIKit
             //处理UILoadPath
             pipeline.AddLast(new GeneralOpenUIHandler(OpenUIHandlerNameConst.GetUILoadPath, (ref OpenUIPayload payload, IOpenUIHandler next) =>
             {
-#if TINAX_DEBUG_DEV
-                Debug.Log("[UIKIT]进入处理LoadPath的Pipeline流程");
-#endif
-                switch (mUINameMode)
-                {
-                    case UINameMode.UIGroup:
-                        if (mCurUIGroup != null)
-                        {
-                            if (mCurUIGroup.TryGetPath(payload.UIName, out var _loadpath))
-                                payload.UILoadPath = _loadpath;
-                            else
-                                throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + payload.UIName, UIKitErrorCode.InvalidUIName);
-                        }
-                        else
-                            throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"无效的设置，UI组为空" : $"Invalid configuration: UI Group is empty."), UIKitErrorCode.InvalidUIGroup);
-
-                        break;
-
-                    case UINameMode.RelativeDirectory:
-                        payload.UILoadPath = (mUIRootDirLoadPath.IsNullOrEmpty()) ? payload.UIName : mUIRootDirLoadPath_withSlash + payload.UIName;
-                        break;
-                }
-
-                if (payload.UILoadPath.IsNullOrEmpty())
-                    throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{payload.UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{payload.UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
-
-                return true;
+                return _Pipeline_Func_GetUILoadPath(payload);
             }));
 
             //检查是否已加载 (检查是否已经打开UI, 如果UI已经打开了，并且该UI设置不允许打开多个的话，则把已存在的UI置顶，并不再加载
@@ -1020,6 +1006,9 @@ namespace TinaX.UIKit
 
         }
 
+
+        
+
         /// <summary>
         /// 执行加载UIPrefab的方法
         /// </summary>
@@ -1032,6 +1021,32 @@ namespace TinaX.UIKit
             entity.UIPrefab = prefab;
         }
 
+
+        #region OpenUI Pipeline Functions
+        //OpenUI Pipeline可共用的部分放在这里
+
+        private bool _Pipeline_Func_GetUILoadPath(OpenUIPayload payload)
+        {
+#if TINAX_DEBUG_DEV
+            Debug.Log("[UIKIT]进入处理LoadPath的Pipeline流程");
+#endif
+            if (m_Router.TryGetUILoadPath(payload.UIName, out string _loadPath))
+            {
+                payload.UILoadPath = _loadPath;
+            }
+            else
+            {
+                throw new UIKitException("[TinaX.UIKit] Invalid UIName : " + payload.UIName, UIKitErrorCode.InvalidUIName);
+            }
+
+
+            if (payload.UILoadPath.IsNullOrEmpty())
+                throw new UIKitException("[TinaX.UIKit] " + (IsChinese ? $"未能获取到UI \"{payload.UIName}\" 的加载路径，请检查设置或传入参数" : $"Cannot get UI Path by UI Name \"{payload.UIName}\", Please check config or args."), UIKitErrorCode.ConnotGetUIPath);
+
+            return true;
+        }
+
+        #endregion
 
 
         private static bool? _ischinese;

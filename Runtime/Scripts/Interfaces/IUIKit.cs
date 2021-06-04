@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Entity;
 using TinaX.UIKit.Pipelines.OpenUI;
+using TinaX.UIKit.Router;
 using TinaX.XComponent;
 using UnityEngine;
 
@@ -47,5 +48,6 @@ namespace TinaX.UIKit
         
         IUIEntity OpenUIWithParam(string UIName, OpenUIParam openUIParam, params object[] args);
         void OpenUIWithParamAsync(string UIName, OpenUIParam openUIParam, Action<IUIEntity, XException> callback, params object[] args);
+        void SetUIRouter(IRouter router);
     }
 }
