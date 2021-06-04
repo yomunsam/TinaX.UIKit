@@ -14,7 +14,7 @@ namespace TinaX.UIKit.Router
             {
                 if (m_UIRootDirLoadPath.EndsWith("/"))
                     m_UIRootDirLoadPath = m_UIRootDirLoadPath.Substring(0, m_UIRootDirLoadPath.Length - 1);
-                m_UIRootDirLoadPathWithSlash = m_UIRootDirLoadPathWithSlash + "/";
+                m_UIRootDirLoadPathWithSlash = m_UIRootDirLoadPath + "/";
             }
         }
 
