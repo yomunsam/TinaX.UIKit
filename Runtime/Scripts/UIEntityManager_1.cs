@@ -1,8 +1,5 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TinaX.UIKit.Entity;
 
 namespace TinaX.UIKit.Internal
@@ -13,7 +10,7 @@ namespace TinaX.UIKit.Internal
         /// Key: Path
         /// </summary>
         private Dictionary<string, List<UIEntity>> mDict_UIEntitys = new Dictionary<string, List<UIEntity>>();
-        List<UIEntity> mList_UIEntitys = new List<UIEntity>();
+        List<UIEntity> m_List_UIEntitys = new List<UIEntity>();
 
 
         public void Register(UIEntity entity)
@@ -25,8 +22,8 @@ namespace TinaX.UIKit.Internal
                 if (!mDict_UIEntitys[entity.UIPath].Contains(entity))
                     mDict_UIEntitys[entity.UIPath].Add(entity);
 
-                if (!mList_UIEntitys.Contains(entity))
-                    mList_UIEntitys.Add(entity);
+                if (!m_List_UIEntitys.Contains(entity))
+                    m_List_UIEntitys.Add(entity);
             }
         }
 
@@ -40,7 +37,7 @@ namespace TinaX.UIKit.Internal
                     {
                         if(entities[i].UIStatue == UIStatus.Unloaded)
                         {
-                            mList_UIEntitys.Remove(entities[i]);
+                            m_List_UIEntitys.Remove(entities[i]);
                             entities.RemoveAt(i);
                         }
                     }
@@ -68,8 +65,8 @@ namespace TinaX.UIKit.Internal
         {
             lock (this)
             {
-                if (mList_UIEntitys.Contains(entity))
-                    mList_UIEntitys.Remove(entity);
+                if (m_List_UIEntitys.Contains(entity))
+                    m_List_UIEntitys.Remove(entity);
                 if (mDict_UIEntitys.ContainsKey(entity.UIPath))
                 {
                     if (mDict_UIEntitys[entity.UIPath].Contains(entity))
@@ -81,5 +78,12 @@ namespace TinaX.UIKit.Internal
             }
         }
         
+        public IEnumerable<UIEntity> FindByUIName(string UIName)
+        {
+            return m_List_UIEntitys.Where(entity => entity.UIName == UIName);
+        }
+
+
+
     }
 }
