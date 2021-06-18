@@ -127,7 +127,6 @@ namespace TinaX.UIKit
         private void OnDestroy()
         {
             this.OnDestroyUI?.Invoke();
-            var emmList = this.OnDestroyUI.GetInvocationList();
             this.OnDestroyUIEvent?.Invoke();
             //OnCloseUI?.Invoke();
         }
