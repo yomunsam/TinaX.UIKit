@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace TinaX.UIKit.Router
 {
     /// <summary>
@@ -9,6 +5,6 @@ namespace TinaX.UIKit.Router
     /// </summary>
     public interface IRouter
     {
-        public bool TryGetUILoadPath(string uiName, out string uiLoadPath);
+        bool TryGetUILoadPath(string uiName, out string uiLoadPath);
     }
 }
