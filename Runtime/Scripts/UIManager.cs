@@ -762,7 +762,7 @@ namespace TinaX.UIKit
             }));
 
             //xBehaviour，处理UI Main Handler为xBehaviour的情况
-            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.Instantiates, (payload, next) =>
+            pipeline.AddLast(new GeneralOpenUIAsyncHandler(OpenUIHandlerNameConst.XBehaviour, (payload, next) =>
             {
 #if TINAX_DEBUG_DEV
                 Debug.Log("[UIKIT]pipeline处理UI Main Handler是xBehaviour的情况");
@@ -944,7 +944,7 @@ namespace TinaX.UIKit
             }));
 
             //xBehaviour，处理UI Main Handler为xBehaviour的情况
-            pipeline.AddLast(new GeneralOpenUIHandler(OpenUIHandlerNameConst.Instantiates, (ref OpenUIPayload payload, IOpenUIHandler next) =>
+            pipeline.AddLast(new GeneralOpenUIHandler(OpenUIHandlerNameConst.XBehaviour, (ref OpenUIPayload payload, IOpenUIHandler next) =>
             {
 #if TINAX_DEBUG_DEV
                 Debug.Log("[UIKIT]pipeline处理UI Main Handler是xBehaviour的情况");
