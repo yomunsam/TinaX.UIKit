@@ -3,7 +3,6 @@
     "rootNamespace": "TinaX.UIKit",
     "references": [
         "GUID:4e58fd8b44ff4c14f917ce28647bad94",
-        "GUID:9db5e326baf15604fb41b0ba171e2039",
         "GUID:560b04d1a97f54a4e82edc0cbbb69285",
         "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],

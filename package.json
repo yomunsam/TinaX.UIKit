@@ -1,25 +1,23 @@
 {
   "name": "io.nekonya.tinax.uikit",
-  "version": "6.6.22",
+  "version": "7.0.0-preview",
   "displayName": "TinaX.UIKit",
-  "description": "UGUI-based UI framework",
-  "unity": "2019.4",
+  "description": "General UI framework",
+  "unity": "2020.3",
   "keywords": [
     "TinaX",
     "TinaX Framework",
     "UI",
-    "UIKit",
-    "UGUI"
+    "UIKit"
   ],
   "author": {
     "name": "yomunsam",
-    "email": "yomunsam@gmail.com",
+    "email": "yomunsam@nekonya.io",
     "url": "https://yomunchan.moe"
   },
   "type": "library",
   "license":"MIT",
   "dependencies": {
-    "io.nekonya.tinax.core":"6.6.23",
-    "io.nekonya.tinax.xcomponent":"6.6.4"
+    "io.nekonya.tinax.core":"7.0.0-preview"
   }
 }
