@@ -7,6 +7,6 @@ namespace TinaX.UIKit.Pipelines.GetUIPage
     {
         string HandlerName { get; }
 
-        UniTask GetPageAsync(string pageUri, GetUIPageContext context, CancellationToken cancellationToken);
+        UniTask GetPageAsync(GetUIPageContext context, GetUIPagePayload payload, CancellationToken cancellationToken);
     }
 }

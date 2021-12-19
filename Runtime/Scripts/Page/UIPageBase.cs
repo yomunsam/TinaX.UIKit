@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
+using TinaX.UIKit.Page.Controller;
 using TinaX.UIKit.Page.Group;
 using TinaX.UIKit.Page.View;
 
@@ -16,6 +17,17 @@ namespace TinaX.UIKit.Page
             this.m_ViewProvider = viewProvider;
         }
 
+        public UIPageBase(IPageViewProvider viewProvider, PageControllerBase? controller)
+        {
+            this.m_ViewProvider = viewProvider;
+            m_Controller = controller;
+
+            if(controller!= null)
+            {
+                controller.Page = this;
+            }
+        }
+
         /// <summary>
         /// Page的View
         /// </summary>
@@ -26,6 +38,10 @@ namespace TinaX.UIKit.Page
         protected string m_PageUri { get; set; } = string.Empty;
 
         protected string m_Name { get; set; } = string.Empty;
+
+        protected PageControllerBase? m_Controller { get; set; }
+
+        public PageControllerBase? Controller => m_Controller;
 
         public virtual string Name => m_Name;
 

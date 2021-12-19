@@ -6,6 +6,7 @@ using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Consts;
 using TinaX.UIKit.Options;
 using TinaX.UIKit.Page;
+using TinaX.UIKit.Page.Controller;
 using TinaX.UIKit.Pipelines.GetUIPage;
 using TinaX.UIKit.Providers.UIKitProvider;
 using UnityEngine;
@@ -59,27 +60,31 @@ namespace TinaX.UIKit.Services
         
         public UniTask<UIPageBase> GetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
         {
-            return DoGetUIPageAsync(pageUri, cancellationToken);
+            return DoGetUIPageAsync(new GetUIPagePayload(pageUri.Trim()), cancellationToken);
         }
         
-        private async UniTask<UIPageBase> DoGetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
+        public UniTask<UIPageBase> GetUIPageAsync(string pageUri, PageControllerBase controller, CancellationToken cancellationToken = default)
+        {
+            var payload = new GetUIPagePayload(pageUri.Trim())
+            {
+                PageController = controller,
+            };
+            return DoGetUIPageAsync(payload, cancellationToken);
+        }
+
+        private async UniTask<UIPageBase> DoGetUIPageAsync(GetUIPagePayload payload, CancellationToken cancellationToken = default)
         {
             //上下文
-            var context = new GetUIPageContext
-            {
-                Services = m_XCore.Services,
-            };
+            var context = new GetUIPageContext(m_XCore.Services);
 
             //开始队列
             await m_GetUIPageAsyncPipeline.StartAsync(async handler =>
             {
-                await handler.GetPageAsync(pageUri, context, cancellationToken);
+                await handler.GetPageAsync(context, payload, cancellationToken);
                 return !context.BreakPipeline; //返回值表示pipeline是否继续
             });
 
-            await context.UIPageReuslt.ReadyViewAsync(cancellationToken);
-
-            return context.UIPageReuslt;
+            return payload.UIPage;
         }
     }
 }
