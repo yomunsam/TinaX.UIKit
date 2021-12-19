@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.Container;
-using TinaX.UIKit.Providers.PageProvider;
+using TinaX.Systems.Pipeline;
+using TinaX.UIKit.Pipelines.GetUIPage;
 
 namespace TinaX.UIKit.Providers.UIKitProvider
 {
@@ -60,6 +61,14 @@ namespace TinaX.UIKit.Providers.UIKitProvider
                 tasks.Add(m_Providers[i].StartAsync(services, cancellationToken));
             }
             await UniTask.WhenAll(tasks);
+        }
+
+        public void ConfigureGetUIPagePipeline(XPipeline<IGetUIPageAsyncHandler> pipeline, IServiceContainer services)
+        {
+            for (int i = 0; i < m_Providers.Count; i++)
+            {
+                m_Providers[i].ConfigureGetUIPagePipeline(ref pipeline, ref services);
+            }
         }
 
 

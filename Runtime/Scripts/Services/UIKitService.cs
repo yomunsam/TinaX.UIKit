@@ -2,9 +2,11 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.Options;
+using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Consts;
 using TinaX.UIKit.Options;
 using TinaX.UIKit.Page;
+using TinaX.UIKit.Pipelines.GetUIPage;
 using TinaX.UIKit.Providers.UIKitProvider;
 using UnityEngine;
 
@@ -15,6 +17,7 @@ namespace TinaX.UIKit.Services
         private readonly UIKitOptions m_Options;
         private readonly UIKitProvidersManager m_UIKitProvidersManager;
         private readonly IXCore m_XCore;
+        private XPipeline<IGetUIPageAsyncHandler> m_GetUIPageAsyncPipeline = new XPipeline<IGetUIPageAsyncHandler>();
 
         public UIKitService(IOptions<UIKitOptions> options,
             UIKitProvidersManager uIKitProvidersManager,
@@ -42,6 +45,8 @@ namespace TinaX.UIKit.Services
 #endif
             await m_UIKitProvidersManager.StartAllAsync(m_XCore.Services, cancellationToken);
 
+            //准备GetUIPage管线
+            m_UIKitProvidersManager.ConfigureGetUIPagePipeline(m_GetUIPageAsyncPipeline, m_XCore.Services);
 
             m_Initialized = true;
         }
@@ -54,9 +59,27 @@ namespace TinaX.UIKit.Services
         
         public UniTask<UIPageBase> GetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return DoGetUIPageAsync(pageUri, cancellationToken);
         }
         
+        private async UniTask<UIPageBase> DoGetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
+        {
+            //上下文
+            var context = new GetUIPageContext
+            {
+                Services = m_XCore.Services,
+            };
 
+            //开始队列
+            await m_GetUIPageAsyncPipeline.StartAsync(async handler =>
+            {
+                await handler.GetPageAsync(pageUri, context, cancellationToken);
+                return !context.BreakPipeline; //返回值表示pipeline是否继续
+            });
+
+            await context.UIPageReuslt.ReadyViewAsync(cancellationToken);
+
+            return context.UIPageReuslt;
+        }
     }
 }
