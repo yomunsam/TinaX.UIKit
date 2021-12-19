@@ -10,21 +10,26 @@ namespace TinaX.UIKit.Page
     {
 #nullable enable
 
-        public UIPageBase() { }
-
-        public UIPageBase(IPageViewProvider viewProvider)
+        public UIPageBase()
         {
+        }
+
+        public UIPageBase(string pageUri, IPageViewProvider viewProvider)
+        {
+            this.m_PageUri = pageUri;
             this.m_ViewProvider = viewProvider;
         }
 
-        public UIPageBase(IPageViewProvider viewProvider, PageControllerBase? controller)
+        public UIPageBase(string pageUri, IPageViewProvider viewProvider, PageControllerBase? controller)
         {
+            this.m_PageUri = pageUri;
             this.m_ViewProvider = viewProvider;
             m_Controller = controller;
 
             if(controller!= null)
             {
                 controller.Page = this;
+                m_Name = controller.GetType().Name;
             }
         }
 
@@ -41,14 +46,35 @@ namespace TinaX.UIKit.Page
 
         protected PageControllerBase? m_Controller { get; set; }
 
+        /// <summary>
+        /// UI序号
+        /// </summary>
+        protected int m_Order { get; set; } = 0;
+
         public PageControllerBase? Controller => m_Controller;
 
+
         public virtual string Name => m_Name;
+
 
         /// <summary>
         /// 总Page数量（包括自己和子项）
         /// </summary>
         public virtual int PageCount => 1;
+
+        /// <summary>
+        /// UI序号
+        /// </summary>
+        public virtual int Order
+        {
+            get => m_Order;
+            set
+            {
+                m_Order = value;
+                m_Content?.SetOrder(value);
+            }
+        }
+
 
         /// <summary>
         /// 准备好视图到内存（资产加载过程）
