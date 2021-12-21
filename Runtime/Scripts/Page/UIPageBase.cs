@@ -34,6 +34,11 @@ namespace TinaX.UIKit.Page
         }
 
         /// <summary>
+        /// Page所属的组（可能为空）
+        /// </summary>
+        protected UIPageGroup? m_Parent;
+
+        /// <summary>
         /// Page的View
         /// </summary>
         protected PageView? m_Content { get; set; }
@@ -46,6 +51,7 @@ namespace TinaX.UIKit.Page
 
         protected PageControllerBase? m_Controller { get; set; }
 
+
         /// <summary>
         /// UI序号
         /// </summary>
@@ -54,13 +60,14 @@ namespace TinaX.UIKit.Page
         public PageControllerBase? Controller => m_Controller;
 
 
+
         public virtual string Name => m_Name;
 
 
         /// <summary>
-        /// 总Page数量（包括自己和子项）
+        /// 总Page的尺寸（包括自己和子项）
         /// </summary>
-        public virtual int PageCount => 1;
+        public virtual int PageSize => 1;
 
         /// <summary>
         /// UI序号
@@ -75,6 +82,7 @@ namespace TinaX.UIKit.Page
             }
         }
 
+        public virtual UIPageGroup? Parent => m_Parent;
 
         /// <summary>
         /// 准备好视图到内存（资产加载过程）
@@ -94,13 +102,20 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// UIPage被加入一个组
         /// </summary>
-        public abstract void OnJoinGroup(UIPageGroup group);
+        public virtual void OnJoinGroup(UIPageGroup group)
+        {
+            m_Parent = group;
+        }
 
         /// <summary>
         /// UIPage被移出了一个组
         /// </summary>
         /// <param name="group"></param>
-        public abstract void OnLeaveGroup(UIPageGroup group);
+        public virtual void OnLeaveGroup(UIPageGroup group)
+        {
+            if (m_Parent != null && m_Parent == group)
+                m_Parent = null;
+        }
 
 
         

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TinaX.Container;
 using TinaX.Options;
 using TinaX.Systems.Pipeline;
+using TinaX.UIKit.Canvas;
 using TinaX.UIKit.Consts;
 using TinaX.UIKit.Options;
 using TinaX.UIKit.Page;
@@ -18,7 +20,7 @@ namespace TinaX.UIKit.Services
         private readonly UIKitOptions m_Options;
         private readonly UIKitProvidersManager m_UIKitProvidersManager;
         private readonly IXCore m_XCore;
-        private XPipeline<IGetUIPageAsyncHandler> m_GetUIPageAsyncPipeline = new XPipeline<IGetUIPageAsyncHandler>();
+        private readonly UIKitCanvasManager m_UIKitCanvasManager = new UIKitCanvasManager();
 
         public UIKitService(IOptions<UIKitOptions> options,
             UIKitProvidersManager uIKitProvidersManager,
@@ -29,8 +31,11 @@ namespace TinaX.UIKit.Services
             this.m_XCore = core;
         }
 
-
         private bool m_Initialized;
+        private XPipeline<IGetUIPageAsyncHandler> m_GetUIPageAsyncPipeline = new XPipeline<IGetUIPageAsyncHandler>();
+
+
+        public IServiceContainer Services => m_XCore.Services;
 
 
         public async UniTask StartAsync(CancellationToken cancellationToken = default)
@@ -57,7 +62,15 @@ namespace TinaX.UIKit.Services
         //{
 
         //}
-        
+
+        #region UIKit Canvas
+        public void RegisterUIKitCanvas(UIKitCanvas canvas)
+        {
+            m_UIKitCanvasManager.Add(canvas);
+        }
+
+        #endregion
+
         public UniTask<UIPageBase> GetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
         {
             return DoGetUIPageAsync(new GetUIPagePayload(pageUri.Trim()), cancellationToken);
@@ -71,6 +84,16 @@ namespace TinaX.UIKit.Services
             };
             return DoGetUIPageAsync(payload, cancellationToken);
         }
+
+        public UniTask<UIPageBase> GetUIPageAsync(GetUIPageArgs args, CancellationToken cancellationToken = default)
+        {
+            var payload = new GetUIPagePayload(args.PageUri.Trim())
+            {
+                PageController = args.PageController
+            };
+            return DoGetUIPageAsync(payload, cancellationToken);
+        }
+        
 
         private async UniTask<UIPageBase> DoGetUIPageAsync(GetUIPagePayload payload, CancellationToken cancellationToken = default)
         {

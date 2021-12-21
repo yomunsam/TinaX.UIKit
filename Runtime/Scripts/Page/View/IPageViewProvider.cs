@@ -13,6 +13,8 @@ namespace TinaX.UIKit.Page.View
         PageView GetPageView(UIPageBase page);
 
         UniTask<PageView> GetPageViewAsync(UIPageBase page, CancellationToken cancellationToken = default); 
+
+        string ViewUri { get; }
     }
 
     public interface IPageViewProvider<TView, TPage> : IPageViewProvider 

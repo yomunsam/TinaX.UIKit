@@ -22,9 +22,9 @@ namespace TinaX.UIKit.Page.Group
         }
 
 
-        protected UIPageGroup? m_Parent;
+        
 
-        public override int PageCount
+        public override int PageSize
             => m_Children.Count + 1; //自己和子项的总数
 
 
@@ -41,10 +41,7 @@ namespace TinaX.UIKit.Page.Group
             throw new System.NotImplementedException();
         }
 
-        public override void OnJoinGroup(UIPageGroup group)
-        {
-            m_Parent = group;
-        }
+
 
         public override void OnLeaveGroup(UIPageGroup group)
         {
@@ -69,7 +66,7 @@ namespace TinaX.UIKit.Page.Group
             for(int i = 0; i < m_Children.Count; i++)
             {
                 m_Children[i].Order = counter;
-                counter += m_Children[i].PageCount;
+                counter += m_Children[i].PageSize;
             }
         }
 
@@ -78,6 +75,22 @@ namespace TinaX.UIKit.Page.Group
         public override string ToString()
         {
             return $"[Group]{this.m_Name}";
+        }
+
+        public virtual UIPageGroup GetLastChildGroup()
+        {
+            if(m_Children.Count > 0)
+            {
+                for (var i = m_Children.Count - 1; i >= 0; i--)
+                {
+                    var child = m_Children[i];
+                    if(child is UIPageGroup group)
+                    {
+                        return group.GetLastChildGroup();
+                    }
+                }
+            }
+            return this;
         }
 
         /// <summary>
