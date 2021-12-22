@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.Core.Helper.LogColor;
+using TinaX.UIKit.Canvas;
 using UnityEngine;
 
 namespace TinaX.UIKit.Page.Group
@@ -21,8 +22,10 @@ namespace TinaX.UIKit.Page.Group
             this.m_Name = this.GetHashCode().ToString();
         }
 
+        
 
         
+
 
         public override int PageSize
             => m_Children.Count + 1; //自己和子项的总数
@@ -39,11 +42,6 @@ namespace TinaX.UIKit.Page.Group
         }
 
 
-
-        public override void OnLeaveGroup(UIPageGroup group)
-        {
-            m_Parent = null;
-        }
 
         #region UI Stack
 
@@ -114,6 +112,8 @@ namespace TinaX.UIKit.Page.Group
         }
 
         public override void DisplayView(object[]? args) { } //Group本身没有View，不需要这个
+
+        
     }
 
 #nullable restore

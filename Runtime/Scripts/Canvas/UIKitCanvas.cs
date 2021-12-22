@@ -11,18 +11,21 @@ namespace TinaX.UIKit.Canvas
 
         public UIKitCanvas(UIPageGroup rootGroup)
         {
+            rootGroup.Canvas = this;
             m_RootGroup = rootGroup;
             this.Name = this.GetHashCode().ToString();
         }
 
         public UIKitCanvas(UIPageGroup rootGroup, string name)
         {
+            rootGroup.Canvas = this;
             m_RootGroup = rootGroup;
             this.Name = name;
         }
 
         public UIKitCanvas(UIPageBase mainPage, UIPageGroup rootGroup, string name)
         {
+            rootGroup.Canvas = this;
             m_RootGroup = rootGroup;
             rootGroup.Push(mainPage);
             this.Name = name;

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TinaX.UIKit.Canvas;
 using TinaX.UIKit.Consts;
 using TinaX.UIKit.Page.Controller;
 using TinaX.UIKit.Page.Group;
@@ -13,6 +14,7 @@ namespace TinaX.UIKit.Page
     {
 #nullable enable
 
+        //------构造函数--------------------------------------------------------------------------------------------
         public UIPageBase()
         {
         }
@@ -36,6 +38,12 @@ namespace TinaX.UIKit.Page
             }
         }
 
+        //------内部字段------------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// 是否已显示
+        /// </summary>
+        protected bool m_Displayed = false;
 
         /// <summary>
         /// Page所属的组（可能为空）
@@ -61,9 +69,24 @@ namespace TinaX.UIKit.Page
         /// </summary>
         protected int m_Order { get; set; } = 0;
 
+        /// <summary>
+        /// UIPage位于哪一个UIKitCanvas上
+        /// </summary>
+        protected UIKitCanvas? m_Canvas;
+
+
+
+        //------公开属性-----------------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// View已显示
+        /// </summary>
+        public bool IsDisplayed => m_Displayed;
+
+
         public PageControllerBase? Controller => m_Controller;
 
-
+        public virtual UIPageGroup? Parent => m_Parent;
 
         public virtual string Name => m_Name;
         public virtual string PageUri => m_PageUri;
@@ -87,7 +110,31 @@ namespace TinaX.UIKit.Page
             }
         }
 
-        public virtual UIPageGroup? Parent => m_Parent;
+
+        /// <summary>
+        /// UIPage位于哪一个UIKitCanvas上
+        /// </summary>
+        public virtual UIKitCanvas? Canvas
+        {
+            get
+            {
+                if (m_Canvas == null)
+                    m_Canvas = FindCanvas();
+                return m_Canvas;
+            }
+            set
+            {
+                m_Canvas = value;
+            }
+        }
+
+
+        //UI显示状态---------
+
+        public virtual bool IsViewHidden => m_Content?.IsHidden ?? false;
+
+
+        //------公开方法-------------------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// 准备好视图到内存（资产加载过程）
@@ -152,7 +199,17 @@ namespace TinaX.UIKit.Page
             }
         }
 
-
+        /// <summary>
+        /// 寻找Canvas
+        /// </summary>
+        /// <returns></returns>
+        protected virtual UIKitCanvas? FindCanvas()
+        {
+            if (m_Parent == null)
+                return m_Canvas;
+            else
+                return m_Parent.FindCanvas();
+        }
 
 #nullable restore
     }

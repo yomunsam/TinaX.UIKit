@@ -17,8 +17,15 @@
             this.m_Page = page;
         }
 
+        /// <summary>
+        /// 视图是否被隐藏（显示之后再隐藏才叫隐藏）
+        /// </summary>
+        protected bool m_Hidden;
+
 
         public virtual string ViewUri => m_ViewUri;
+
+        public virtual bool IsHidden => m_Hidden;
 
 
         /// <summary>
