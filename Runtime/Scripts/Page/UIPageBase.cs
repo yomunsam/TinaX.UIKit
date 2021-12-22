@@ -1,8 +1,11 @@
-﻿using System.Threading;
+﻿using System.Reflection;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using TinaX.UIKit.Consts;
 using TinaX.UIKit.Page.Controller;
 using TinaX.UIKit.Page.Group;
 using TinaX.UIKit.Page.View;
+using TinaX.UIKit.UIMessage;
 
 namespace TinaX.UIKit.Page
 {
@@ -26,12 +29,13 @@ namespace TinaX.UIKit.Page
             this.m_ViewProvider = viewProvider;
             m_Controller = controller;
 
-            if(controller!= null)
+            if (controller!= null)
             {
                 controller.Page = this;
                 m_Name = controller.GetType().Name;
             }
         }
+
 
         /// <summary>
         /// Page所属的组（可能为空）
@@ -62,6 +66,7 @@ namespace TinaX.UIKit.Page
 
 
         public virtual string Name => m_Name;
+        public virtual string PageUri => m_PageUri;
 
 
         /// <summary>
@@ -93,7 +98,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 初始化显示一个View
         /// </summary>
-        public abstract void DisplayView();
+        public abstract void DisplayView(object[]? args);
 
 
 
@@ -102,7 +107,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// UIPage被加入一个组
         /// </summary>
-        public virtual void OnJoinGroup(UIPageGroup group)
+        public virtual void OnJoinGroup(UIPageGroup group, object[]? displayMessageArgs)
         {
             m_Parent = group;
         }
@@ -118,7 +123,35 @@ namespace TinaX.UIKit.Page
         }
 
 
-        
+        /// <summary>
+        /// 对Controller发出UI OnDisplay消息
+        /// </summary>
+        public virtual void SendUIDisplayMessage(object[]? args)
+        {
+            if(m_Controller != null)
+            {
+                //使用接口
+                if(m_Controller is IUIDisplayMessage displayMsg)
+                {
+                    displayMsg.OnDisplay(args);
+                    return;
+                }
+
+                //反射调用
+                var controllerType = m_Controller.GetType();
+                var method = controllerType.GetMethod(UIMessageNameConsts.OnDisplay, BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                if(method != null)
+                {
+                    var methodParams = method.GetParameters();
+                    if(methodParams.Length == 0) //无参数
+                    {
+                        method.Invoke(m_Controller, null);
+                        return;
+                    }
+                }
+            }
+        }
+
 
 
 #nullable restore
