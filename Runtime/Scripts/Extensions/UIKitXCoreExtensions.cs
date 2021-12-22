@@ -7,7 +7,7 @@ using TinaX.UIKit.Providers.UIKitProvider;
 
 namespace TinaX.Services
 {
-    public static class UIKitServiceExtensions
+    public static class UIKitXCoreExtensions
     {
 
         public static IXCore AddUIKit(this IXCore core, Action<UIKitBuilder> uikitBuilder)
