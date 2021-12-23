@@ -2,7 +2,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.Core.Helper.LogColor;
-using TinaX.UIKit.Canvas;
 using UnityEngine;
 
 namespace TinaX.UIKit.Page.Group
@@ -50,7 +49,7 @@ namespace TinaX.UIKit.Page.Group
         /// </summary>
         /// <param name="page"></param>
         /// <param name="displayMessageArgs"></param>
-        public virtual void Push(UIPageBase page, object[]? displayMessageArgs = null)
+        public virtual void Push(UIPageBase page, object?[]? displayMessageArgs = null)
         {
             m_Children.Add(page);
             page.OnJoinGroup(this, displayMessageArgs);
@@ -59,13 +58,13 @@ namespace TinaX.UIKit.Page.Group
 
         /// <summary>
         /// 从组中移除Page
+        /// 调用Page的CloseUI会走到这里
         /// </summary>
         /// <param name="page"></param>
         public virtual void Remove(UIPageBase page)
         {
             if (!m_Children.Contains(page))
-                return; //和咱没关系
-
+                return; //和咱没关系.
         }
 
         /// <summary>
@@ -127,9 +126,9 @@ namespace TinaX.UIKit.Page.Group
             }
         }
 
-        public override void DisplayView(object[]? args) { } //Group本身没有View，不需要这个
+        public override void DisplayView(object?[]? args) { } //Group本身没有View，不需要这个
 
-        public override void ClosePage()
+        public override void ClosePage(object?[]? closeMessageArgs = null)
         {
             throw new System.NotImplementedException();
         }

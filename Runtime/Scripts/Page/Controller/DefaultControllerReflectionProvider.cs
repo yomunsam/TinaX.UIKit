@@ -19,9 +19,9 @@ namespace TinaX.UIKit.Page.Controller
         /// </summary>
         /// <param name="controllerObject"></param>
         /// <param name="messageName"></param>
-        /// <param name="args"></param>
+        /// <param name="messageArgs"></param>
         /// <returns>是否成功</returns>
-        public bool TrySendMessage(object controllerObject, ref Type? controllerType, string messageName, object[]? args)
+        public bool TrySendMessage(object controllerObject, ref Type? controllerType, string messageName, object?[]? messageArgs)
         {
             controllerType ??= GetObjectType(ref controllerObject);
             var method = controllerType!.GetMethod(messageName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -43,21 +43,21 @@ namespace TinaX.UIKit.Page.Controller
                 if(firstParam.ParameterType == m_ObjectArrayType)
                 {
                     //只有唯一一个参数，是一个object[]，所以我们可以把所有数据全部传进去
-                    var invokeArgs = new object[1] {args ?? new object[0]};
+                    var invokeArgs = new object[1] {messageArgs ?? new object[0]};
                     method.Invoke(controllerObject, invokeArgs);
                     return true;
                 }
             }
 
             //定义的方法指定了多个参数，如果和传过来的args一一匹配，则调用
-            if (args == null || args.Length == 0)
+            if (messageArgs == null || messageArgs.Length == 0)
                 return false;
-            if (args.Length > methodParams.Length)
+            if (messageArgs.Length > methodParams.Length)
                 return false;
 
-            for(int i = 0; i < args.Length; i++)
+            for(int i = 0; i < messageArgs.Length; i++)
             {
-                var _arg = args[i];
+                var _arg = messageArgs[i];
                 var _param = methodParams[i];
                 var paramType = _param.ParameterType;
                 if(_arg == null)
@@ -87,7 +87,7 @@ namespace TinaX.UIKit.Page.Controller
             }
 
             //上面一通判断下来都没问题的话，就调用它吧
-            method.Invoke(controllerObject, args);
+            method.Invoke(controllerObject, messageArgs);
             return true;
         }
 

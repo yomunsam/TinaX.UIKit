@@ -156,7 +156,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 初始化显示一个View
         /// </summary>
-        public abstract void DisplayView(object[]? args);
+        public abstract void DisplayView(object?[]? args);
 
 
 
@@ -165,7 +165,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 从Page关闭UIPage的调用入口
         /// </summary>
-        public abstract void ClosePage();
+        public abstract void ClosePage(params object?[]? closeMessageArgs);
 
         /// <summary>
         /// 销毁Page(包括View)
@@ -175,7 +175,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// UIPage被加入一个组
         /// </summary>
-        public virtual void OnJoinGroup(UIPageGroup group, object[]? displayMessageArgs)
+        public virtual void OnJoinGroup(UIPageGroup group, object?[]? displayMessageArgs)
         {
             m_Parent = group;
         }
@@ -194,7 +194,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 对Controller发出UI OnDisplay消息
         /// </summary>
-        public virtual void SendUIDisplayMessage(object[]? args)
+        public virtual void SendUIDisplayMessage(object?[]? args)
         {
             if(m_Controller != null)
             {
@@ -215,7 +215,7 @@ namespace TinaX.UIKit.Page
         /// </summary>
         /// <param name="messageName">消息名</param>
         /// <param name="args">消息参数</param>
-        public virtual void SendMessage(string messageName, object[]? args)
+        public virtual void SendMessage(string messageName, object?[]? args)
         {
             //首先尝试反射调用
             if (ControllerReflectionProvider != null) 

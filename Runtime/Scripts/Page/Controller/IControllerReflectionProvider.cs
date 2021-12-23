@@ -8,7 +8,7 @@ namespace TinaX.UIKit.Page.Controller
     /// </summary>
     public interface IControllerReflectionProvider
     {
-        bool TrySendMessage(object controllerObject, ref Type? controllerType, string messageName, object[]? args);
+        bool TrySendMessage(object controllerObject, ref Type? controllerType, string messageName, object?[]? args);
     }
 #nullable restore
 }

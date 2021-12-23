@@ -3,7 +3,7 @@
 #nullable enable
     public interface IUIDisplayMessage
     {
-        public void OnDisplay(object[]? args);
+        public void OnDisplay(object?[]? args);
     }
 #nullable restore
 }

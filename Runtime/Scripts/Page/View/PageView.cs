@@ -37,7 +37,7 @@
         /// <summary>
         /// Page 入栈时调用
         /// </summary>
-        public abstract void Display(object[]? args);
+        public abstract void Display(object?[]? args);
 
         /// <summary>
         /// 设置序号，如UI显示顺序等和它油管
