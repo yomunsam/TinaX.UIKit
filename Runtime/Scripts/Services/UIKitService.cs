@@ -2,6 +2,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.Container;
+using TinaX.Core.Utils;
+using TinaX.Exceptions;
 using TinaX.Options;
 using TinaX.Systems.Pipeline;
 using TinaX.UIKit.Canvas;
@@ -15,12 +17,18 @@ using UnityEngine;
 
 namespace TinaX.UIKit.Services
 {
+#nullable enable
     public class UIKitService : IUIKit, IUIKitInternalService
     {
+        //------------固定字段-------------------------------------------------------------------------------------------------------
+
         private readonly UIKitOptions m_Options;
         private readonly UIKitProvidersManager m_UIKitProvidersManager;
         private readonly IXCore m_XCore;
         private readonly UIKitCanvasManager m_UIKitCanvasManager = new UIKitCanvasManager();
+        private readonly bool m_IsHans = LocalizationUtil.IsHans(); //关于Log、Exceptions的语言问题
+
+        //------------构造函数-------------------------------------------------------------------------------------------------------
 
         public UIKitService(IOptions<UIKitOptions> options,
             UIKitProvidersManager uIKitProvidersManager,
@@ -31,12 +39,23 @@ namespace TinaX.UIKit.Services
             this.m_XCore = core;
         }
 
+        //------------私有字段-------------------------------------------------------------------------------------------------------
+
         private bool m_Initialized;
         private XPipeline<IGetUIPageAsyncHandler> m_GetUIPageAsyncPipeline = new XPipeline<IGetUIPageAsyncHandler>();
 
+        /// <summary>
+        /// 默认控制器反射提供者
+        /// </summary>
+        private IControllerReflectionProvider? m_DefaultControllerReflectionProvider;
+
+        //------------公开属性-------------------------------------------------------------------------------------------------------
 
         public IServiceContainer Services => m_XCore.Services;
 
+        public IControllerReflectionProvider? DefaultControllerReflectionProvider => m_DefaultControllerReflectionProvider;
+
+        //------------公开方法-------------------------------------------------------------------------------------------------------
 
         public async UniTask StartAsync(CancellationToken cancellationToken = default)
         {
@@ -54,14 +73,15 @@ namespace TinaX.UIKit.Services
             //准备GetUIPage管线
             m_UIKitProvidersManager.ConfigureGetUIPagePipeline(m_GetUIPageAsyncPipeline, m_XCore.Services);
 
+            //准备默认的控制器反射提供者
+            if(!m_XCore.Services.TryGet<IControllerReflectionProvider>(out m_DefaultControllerReflectionProvider))
+            {
+                m_DefaultControllerReflectionProvider = new DefaultControllerReflectionProvider();
+            }
+
             m_Initialized = true;
         }
 
-        //public async UniTask<TPage> LoadUIAsync<TPage>(string uri, CancellationToken cancellationToken = default) 
-        //    where TPage : UIPageBase
-        //{
-
-        //}
 
         #region UIKit Canvas
         public void RegisterUIKitCanvas(UIKitCanvas canvas)
@@ -72,31 +92,22 @@ namespace TinaX.UIKit.Services
         #endregion
 
         public UniTask<UIPageBase> GetUIPageAsync(string pageUri, CancellationToken cancellationToken = default)
-        {
-            return DoGetUIPageAsync(new GetUIPagePayload(pageUri.Trim()), cancellationToken);
-        }
-        
+            => DoGetUIPageAsync(new GetUIPageArgs(pageUri.Trim()), cancellationToken);
+
         public UniTask<UIPageBase> GetUIPageAsync(string pageUri, PageControllerBase controller, CancellationToken cancellationToken = default)
         {
-            var payload = new GetUIPagePayload(pageUri.Trim())
-            {
-                PageController = controller,
-            };
-            return DoGetUIPageAsync(payload, cancellationToken);
+            var args = new GetUIPageArgs(pageUri.Trim()) { PageController = controller };
+            return DoGetUIPageAsync(args, cancellationToken);
         }
 
         public UniTask<UIPageBase> GetUIPageAsync(GetUIPageArgs args, CancellationToken cancellationToken = default)
-        {
-            var payload = new GetUIPagePayload(args.PageUri.Trim())
-            {
-                PageController = args.PageController
-            };
-            return DoGetUIPageAsync(payload, cancellationToken);
-        }
-        
+            => DoGetUIPageAsync(args, cancellationToken);
 
-        private async UniTask<UIPageBase> DoGetUIPageAsync(GetUIPagePayload payload, CancellationToken cancellationToken = default)
+        //------------私有方法-------------------------------------------------------------------------------------------------------
+
+        private async UniTask<UIPageBase> DoGetUIPageAsync(GetUIPageArgs args, CancellationToken cancellationToken = default)
         {
+            var payload = new GetUIPagePayload(args, m_DefaultControllerReflectionProvider!);
             //上下文
             var context = new GetUIPageContext(m_XCore.Services);
 
@@ -107,7 +118,16 @@ namespace TinaX.UIKit.Services
                 return !context.BreakPipeline; //返回值表示pipeline是否继续
             });
 
-            return payload.UIPage;
+            if(payload.UIPage == null)
+            {
+                if (m_IsHans)
+                    throw new NotFoundException($"获取UI页失败:{args.PageUri}", args.PageUri);
+                else
+                    throw new NotFoundException($"Failed to get UI page:{args.PageUri}", args.PageUri);
+            }
+            return payload.UIPage!;
         }
     }
+
+#nullable restore
 }

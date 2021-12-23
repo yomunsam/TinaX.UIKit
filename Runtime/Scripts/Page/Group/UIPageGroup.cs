@@ -45,11 +45,27 @@ namespace TinaX.UIKit.Page.Group
 
         #region UI Stack
 
+        /// <summary>
+        /// UIPage加入组
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="displayMessageArgs"></param>
         public virtual void Push(UIPageBase page, object[]? displayMessageArgs = null)
         {
             m_Children.Add(page);
             page.OnJoinGroup(this, displayMessageArgs);
             ResetOrder(); //Todo:后期可以优化，ResetOrder是针对所有子页的，其实不是很有必要，Push肯定在最末尾。
+        }
+
+        /// <summary>
+        /// 从组中移除Page
+        /// </summary>
+        /// <param name="page"></param>
+        public virtual void Remove(UIPageBase page)
+        {
+            if (!m_Children.Contains(page))
+                return; //和咱没关系
+
         }
 
         /// <summary>
@@ -113,7 +129,15 @@ namespace TinaX.UIKit.Page.Group
 
         public override void DisplayView(object[]? args) { } //Group本身没有View，不需要这个
 
-        
+        public override void ClosePage()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void DestroyPage()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
 #nullable restore

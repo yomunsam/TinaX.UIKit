@@ -6,18 +6,24 @@ namespace TinaX.UIKit.Pipelines.GetUIPage
 #nullable enable
     public class GetUIPagePayload
     {
-        public GetUIPagePayload(string pageUri)
+
+        public GetUIPagePayload(GetUIPageArgs args, IControllerReflectionProvider defaultControllerReflectionProvider)
         {
-            this.PageUri = pageUri;
-            PageUriLower = pageUri.ToLower();
+            this.GetUIPageArgs = args;
+            PageUriLower = args.PageUri.ToLower();
+            DefaultControllerReflectionProvider = defaultControllerReflectionProvider;
         }
 
-        public string PageUri { get; set; }
+        public GetUIPageArgs GetUIPageArgs;
+
         public string PageUriLower { get; set; }
 
-        public UIPageBase? UIPage { get; set; }
+        public IControllerReflectionProvider DefaultControllerReflectionProvider;
 
-        public PageControllerBase? PageController { get; set; }
+        /// <summary>
+        /// 存放得到的UIPage
+        /// </summary>
+        public UIPageBase? UIPage { get; set; }
     }
 
 #nullable restore

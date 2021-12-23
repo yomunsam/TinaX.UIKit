@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.UIKit.Canvas;
@@ -13,6 +14,9 @@ namespace TinaX.UIKit.Page
     public abstract class UIPageBase
     {
 #nullable enable
+
+        //------固定字段--------------------------------------------------------------------------------------------
+
 
         //------构造函数--------------------------------------------------------------------------------------------
         public UIPageBase()
@@ -61,7 +65,9 @@ namespace TinaX.UIKit.Page
 
         protected string m_Name { get; set; } = string.Empty;
 
-        protected PageControllerBase? m_Controller { get; set; }
+        protected PageControllerBase? m_Controller;
+
+        protected Type? m_ControllerType;
 
 
         /// <summary>
@@ -133,6 +139,11 @@ namespace TinaX.UIKit.Page
 
         public virtual bool IsViewHidden => m_Content?.IsHidden ?? false;
 
+        /// <summary>
+        /// 控制器反射提供者
+        /// </summary>
+        public IControllerReflectionProvider? ControllerReflectionProvider { get; set; }
+
 
         //------公开方法-------------------------------------------------------------------------------------------------------------------
 
@@ -150,6 +161,16 @@ namespace TinaX.UIKit.Page
 
 
         public abstract void HideView();
+
+        /// <summary>
+        /// 从Page关闭UIPage的调用入口
+        /// </summary>
+        public abstract void ClosePage();
+
+        /// <summary>
+        /// 销毁Page(包括View)
+        /// </summary>
+        public abstract void DestroyPage();
 
         /// <summary>
         /// UIPage被加入一个组
@@ -177,27 +198,40 @@ namespace TinaX.UIKit.Page
         {
             if(m_Controller != null)
             {
-                //使用接口
+                //使用专有接口
                 if(m_Controller is IUIDisplayMessage displayMsg)
                 {
                     displayMsg.OnDisplay(args);
                     return;
                 }
 
-                //反射调用
-                var controllerType = m_Controller.GetType();
-                var method = controllerType.GetMethod(UIMessageNameConsts.OnDisplay, BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                if(method != null)
+                //没有专有接口，使用通用方式传递消息
+                this.SendMessage(UIMessageNameConsts.OnDisplay, args);
+            }
+        }
+
+        /// <summary>
+        /// 向Controller发送消息
+        /// </summary>
+        /// <param name="messageName">消息名</param>
+        /// <param name="args">消息参数</param>
+        public virtual void SendMessage(string messageName, object[]? args)
+        {
+            //首先尝试反射调用
+            if (ControllerReflectionProvider != null) 
+            {
+                if(m_Controller != null)
                 {
-                    var methodParams = method.GetParameters();
-                    if(methodParams.Length == 0) //无参数
+                    if (ControllerReflectionProvider.TrySendMessage(m_Controller, ref m_ControllerType, messageName, args))
                     {
-                        method.Invoke(m_Controller, null);
-                        return;
+                        return; //这儿调用成功，方法返回了
                     }
                 }
             }
         }
+
+
+        //------------私有方法们---------------------------------------------------------------------------------------------------------
 
         /// <summary>
         /// 寻找Canvas
@@ -211,6 +245,7 @@ namespace TinaX.UIKit.Page
                 return m_Parent.FindCanvas();
         }
 
-#nullable restore
     }
+#nullable restore
+
 }
