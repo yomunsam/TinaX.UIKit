@@ -49,9 +49,9 @@ namespace TinaX.UIKit.Page
         protected bool m_Displayed = false;
 
         /// <summary>
-        /// 是否已销毁
+        /// 是否已关闭
         /// </summary>
-        protected bool m_Destroyed = false;
+        protected bool m_Closed = false;
 
         /// <summary>
         /// Page所属的组（可能为空）
@@ -93,7 +93,7 @@ namespace TinaX.UIKit.Page
         /// </summary>
         public bool IsDisplayed => m_Displayed;
 
-        public bool IsDestroyed => m_Destroyed;
+        public bool IsClosed => m_Closed;
 
 
         public PageControllerBase? Controller => m_Controller;
@@ -173,10 +173,6 @@ namespace TinaX.UIKit.Page
         /// </summary>
         public abstract void ClosePage(params object?[]? closeMessageArgs);
 
-        /// <summary>
-        /// 销毁Page(包括View)
-        /// </summary>
-        public abstract void DestroyPage();
 
         /// <summary>
         /// UIPage被加入一个组
@@ -194,6 +190,7 @@ namespace TinaX.UIKit.Page
         {
             if (m_Parent != null && m_Parent == group)
                 m_Parent = null;
+            m_Canvas = null;//如果我们离开了一个组，说明我们以前进入过一个组，这就说明我们肯定不是Canvas的根级组，所以要把Canvas清空；
         }
 
 

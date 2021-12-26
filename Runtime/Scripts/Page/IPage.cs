@@ -11,9 +11,9 @@ namespace TinaX.UIKit.Page
         int PageSize { get; }
 
         /// <summary>
-        /// 页面已销毁了吗
+        /// 页面被关闭了吗
         /// </summary>
-        bool IsDestroyed { get; }
+        bool IsClosed { get; }
 
         void ClosePage(params object?[] closeMessageArgs);
         bool SendMessage(string messageName, object?[]? args);

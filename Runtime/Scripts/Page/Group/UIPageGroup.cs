@@ -61,10 +61,13 @@ namespace TinaX.UIKit.Page.Group
         /// 调用Page的CloseUI会走到这里
         /// </summary>
         /// <param name="page"></param>
-        public virtual void Remove(UIPageBase page)
+        public virtual void Remove(UIPageBase child)
         {
-            if (!m_Children.Contains(page))
+            if (!m_Children.Contains(child))
                 return; //和咱没关系.
+            m_Children.Remove(child);
+            //把这件事告诉child
+            child.OnLeaveGroup(this);
         }
 
         /// <summary>
@@ -133,10 +136,7 @@ namespace TinaX.UIKit.Page.Group
             throw new System.NotImplementedException();
         }
 
-        public override void DestroyPage()
-        {
-            throw new System.NotImplementedException();
-        }
+        
     }
 
 #nullable restore
