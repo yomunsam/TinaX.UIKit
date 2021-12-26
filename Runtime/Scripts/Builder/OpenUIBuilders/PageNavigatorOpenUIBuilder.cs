@@ -37,7 +37,7 @@ namespace TinaX.UIKit.Builder.OpenUIBuilders
         }
 
 
-        public UniTask<UIPageBase> OpenUIAsync(CancellationToken cancellationToken = default)
+        public UniTask<IPage> OpenUIAsync(CancellationToken cancellationToken = default)
         {
             return m_Navigator.OpenUIAsync(m_OpenUIArgs, cancellationToken);
         }

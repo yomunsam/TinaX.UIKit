@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.UIKit.Canvas;
@@ -11,7 +10,7 @@ using TinaX.UIKit.UIMessage;
 
 namespace TinaX.UIKit.Page
 {
-    public abstract class UIPageBase
+    public abstract class UIPageBase : IPage
     {
 #nullable enable
 
@@ -48,6 +47,11 @@ namespace TinaX.UIKit.Page
         /// 是否已显示
         /// </summary>
         protected bool m_Displayed = false;
+
+        /// <summary>
+        /// 是否已销毁
+        /// </summary>
+        protected bool m_Destroyed = false;
 
         /// <summary>
         /// Page所属的组（可能为空）
@@ -88,6 +92,8 @@ namespace TinaX.UIKit.Page
         /// View已显示
         /// </summary>
         public bool IsDisplayed => m_Displayed;
+
+        public bool IsDestroyed => m_Destroyed;
 
 
         public PageControllerBase? Controller => m_Controller;
@@ -194,20 +200,40 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 对Controller发出UI OnDisplay消息
         /// </summary>
-        public virtual void SendUIDisplayMessage(object?[]? args)
+        public virtual bool SendUIDisplayMessage(object?[]? args)
         {
             if(m_Controller != null)
             {
                 //使用专有接口
                 if(m_Controller is IUIDisplayMessage displayMsg)
                 {
-                    displayMsg.OnDisplay(args);
-                    return;
+                    displayMsg.OnDisplayed(args);
+                    return true;
                 }
 
                 //没有专有接口，使用通用方式传递消息
-                this.SendMessage(UIMessageNameConsts.OnDisplay, args);
+                return this.SendMessage(UIMessageNameConsts.OnDisplayed, args);
             }
+
+            return false;
+        }
+
+        public virtual bool SendUIClosedMessage(object?[]? args)
+        {
+            if(m_Controller == null)
+            {
+                //专有接口
+                if(m_Controller is IUIClosedMessage closedMsg)
+                {
+                    closedMsg.OnClosed(args);
+                    return true;
+                }
+
+                //没有专用接口，尝试通用方式传递消息
+                return this.SendMessage(UIMessageNameConsts.OnClosed, args);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -215,7 +241,8 @@ namespace TinaX.UIKit.Page
         /// </summary>
         /// <param name="messageName">消息名</param>
         /// <param name="args">消息参数</param>
-        public virtual void SendMessage(string messageName, object?[]? args)
+        /// <returns>是否发送成功</returns>
+        public virtual bool SendMessage(string messageName, object?[]? args)
         {
             //首先尝试反射调用
             if (ControllerReflectionProvider != null) 
@@ -224,10 +251,11 @@ namespace TinaX.UIKit.Page
                 {
                     if (ControllerReflectionProvider.TrySendMessage(m_Controller, ref m_ControllerType, messageName, args))
                     {
-                        return; //这儿调用成功，方法返回了
+                        return true; //这儿调用成功，方法返回了
                     }
                 }
             }
+            return false;
         }
 
 

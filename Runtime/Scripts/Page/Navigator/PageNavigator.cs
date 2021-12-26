@@ -18,14 +18,19 @@ namespace TinaX.UIKit.Page.Navigator
         /// </summary>
         protected UIPageBase m_Page;
         protected IUIKit m_UIKit;
+        private readonly IXCore m_Core;
 
-        public PageNavigator(UIPageBase page, IUIKit uiKit)
+
+        public PageNavigator(UIPageBase page, IUIKit uiKit, IXCore xCore)
         {
             m_Page = page;
             m_UIKit = uiKit;
+            this.m_Core = xCore;
         }
 
-        public virtual async UniTask<UIPageBase> OpenUIAsync(OpenUIArgs args, CancellationToken cancellationToken = default)
+        public IXCore XCore => m_Core;
+
+        public virtual async UniTask<IPage> OpenUIAsync(OpenUIArgs args, CancellationToken cancellationToken = default)
         {
             if (m_Page.Parent == null)
                 throw new XException($"Page {m_Page.Name} must have parent");
@@ -35,10 +40,10 @@ namespace TinaX.UIKit.Page.Navigator
             return page;
         }
 
-        public virtual UniTask<UIPageBase> OpenUIAsync(string pageUri, CancellationToken cancellationToken = default)
+        public virtual UniTask<IPage> OpenUIAsync(string pageUri, CancellationToken cancellationToken = default)
             => this.OpenUIAsync(new OpenUIArgs(pageUri), cancellationToken);
 
-        public virtual UniTask<UIPageBase> OpenUIAsync(string pageUri, PageControllerBase controller, params object[] displayMessageArgs)
+        public virtual UniTask<IPage> OpenUIAsync(string pageUri, PageControllerBase controller, params object[] displayMessageArgs)
         {
             var args = new OpenUIArgs(pageUri)
             {

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace TinaX.UIKit.Page.Group
 {
 #nullable enable
-    public class UIPageGroup : UIPageBase
+    public class UIPageGroup : UIPageBase, IGroup
     {
         protected readonly List<UIPageBase> m_Children = new List<UIPageBase>();
 

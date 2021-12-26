@@ -21,8 +21,8 @@ namespace TinaX.UIKit.Page.View
         where TView : PageView 
         where TPage : UIPageBase
     {
-        TView GetPageViewGeneric(TPage page);
+        TView GetPageView(TPage page);
 
-        UniTask<TView> GetPageViewGenericAsync(TPage page, CancellationToken cancellationToken = default);
+        UniTask<TView> GetPageViewAsync(TPage page, CancellationToken cancellationToken = default);
     }
 }
