@@ -58,8 +58,7 @@ namespace TinaX.UIKit.Page.View
         /// <summary>
         /// 销毁View
         /// </summary>
-        /// <param name="delayTime">延迟销毁时间</param>
-        public abstract void Destroy(TimeSpan? delayTime = null); //有个Closed的UI消息了，所以说Destory就不做消息参数了
+        public abstract void Destroy(); //有个Closed的UI消息了，所以说Destory就不做消息参数了
 
         //------------内部方法---------------------------------------------------------------------------------------
 

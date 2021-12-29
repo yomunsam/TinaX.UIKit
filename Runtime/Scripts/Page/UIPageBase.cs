@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TinaX.UIKit.Canvas;
@@ -15,6 +16,11 @@ namespace TinaX.UIKit.Page
 #nullable enable
 
         //------固定字段--------------------------------------------------------------------------------------------
+        protected List<Action<IPage>> m_OnDisplayedActions = new List<Action<IPage>>();
+        protected List<Action<IPage>> m_OnHiddenActions = new List<Action<IPage>>();
+        protected List<Action<IPage>> m_OnShowedActions = new List<Action<IPage>>();
+        protected List<Action<IPage>> m_OnClosedActions = new List<Action<IPage>>();
+        protected List<Action<IPage>> m_OnActiveActions = new List<Action<IPage>>(); //活跃，当UI页被置顶时调用
 
 
         //------构造函数--------------------------------------------------------------------------------------------
@@ -53,6 +59,8 @@ namespace TinaX.UIKit.Page
         /// </summary>
         protected bool m_Closed = false;
 
+        protected bool m_Closing = false; //是否正在关闭，因为播放UI动画等原因，关闭可能需要有延时
+
         /// <summary>
         /// Page所属的组（可能为空）
         /// </summary>
@@ -84,7 +92,10 @@ namespace TinaX.UIKit.Page
         /// </summary>
         protected UIKitCanvas? m_Canvas;
 
-
+        /// <summary>
+        /// UI页关闭延迟秒数
+        /// </summary>
+        protected float m_CloseDelaySeconds = 0;
 
         //------公开属性-----------------------------------------------------------------------------------------------
 
@@ -150,6 +161,10 @@ namespace TinaX.UIKit.Page
         /// </summary>
         public IControllerReflectionProvider? ControllerReflectionProvider { get; set; }
 
+        /// <summary>
+        /// UI关闭延迟时间
+        /// </summary>
+        public TimeSpan CloseDelayTime => TimeSpan.FromSeconds(m_CloseDelaySeconds);
 
         //------公开方法-------------------------------------------------------------------------------------------------------------------
 
@@ -171,7 +186,7 @@ namespace TinaX.UIKit.Page
         /// <summary>
         /// 从Page关闭UIPage的调用入口
         /// </summary>
-        public abstract void ClosePage(params object?[]? closeMessageArgs);
+        public abstract void ClosePage(params object?[] closeMessageArgs);
 
 
         /// <summary>
@@ -255,6 +270,42 @@ namespace TinaX.UIKit.Page
             return false;
         }
 
+        //UI关闭延迟时间------
+
+        /// <summary>
+        /// 设置 关闭UI页延迟时间
+        /// 默认情况下，如果调用了多次的话，会用时间长的覆盖时间短的
+        /// </summary>
+        /// <param name="seconds">时间（秒）</param>
+        /// <param name="cover">覆盖，强制使用本次设置的时间为UI页的延迟时间</param>
+        public void SetCloseDelayTime(float seconds, bool cover = false)
+        {
+            if(cover || seconds > m_CloseDelaySeconds)
+                m_CloseDelaySeconds = seconds;
+        }
+
+        /// <summary>
+        /// 在UI页现有的延迟时间基础上添加指定的延迟时间
+        /// </summary>
+        /// <param name="seconds"></param>
+        public void AddCloseDelayTime(float seconds)
+        {
+            m_CloseDelaySeconds += seconds;
+        }
+
+        //------UI Actions
+        public void OnPageDisplayed(Action<IPage> action)
+        {
+            if(!m_OnDisplayedActions.Contains(action))
+                m_OnDisplayedActions.Add(action);
+        }
+
+        public void OnPageClosed(Action<IPage> action)
+        {
+            if(!m_OnClosedActions.Contains(action))
+                m_OnClosedActions.Add(action);
+        }
+
 
         //------------私有方法们---------------------------------------------------------------------------------------------------------
 
@@ -270,6 +321,21 @@ namespace TinaX.UIKit.Page
                 return m_Parent.FindCanvas();
         }
 
+        protected virtual void InvokeOnDisplayedActions()
+        {
+            for(int i = 0; i < m_OnDisplayedActions.Count; i++)
+            {
+                m_OnDisplayedActions[i]?.Invoke(this);
+            }
+        }
+
+        protected virtual void InvokeOnClosedActions()
+        {
+            for (int i = 0; i < m_OnClosedActions.Count; i++)
+            {
+                m_OnClosedActions[i]?.Invoke(this);
+            }
+        }
     }
 #nullable restore
 
