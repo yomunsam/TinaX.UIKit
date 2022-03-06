@@ -164,6 +164,11 @@ namespace TinaX.UIKit
                 event_system.sendNavigationEvents = true;
                 event_system.pixelDragThreshold = 10;
                 var input_module = es_go.GetComponentOrAdd<UnityEngine.EventSystems.StandaloneInputModule>();
+
+                if(mConfig.DontDestroyEventSystem)
+                {
+                    es_go.DontDestroy();
+                }
             }
 #endif
 

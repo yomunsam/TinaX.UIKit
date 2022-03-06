@@ -26,6 +26,8 @@ namespace TinaX.UIKit.Internal
 
         public bool AutoCreateEventSystem = true;
 
+        public bool DontDestroyEventSystem = true;
+
         public Color DefaultUIMaskColor = Color.black;
 
         #region Canvas Scaler

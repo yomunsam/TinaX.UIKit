@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TinaX;
+﻿using TinaX;
 using TinaX.UIKit;
 using TinaX.UIKit.Const;
 using TinaX.UIKit.Internal;
@@ -100,6 +95,14 @@ namespace TinaXEditor.UIKit.Internal
                         EditorGUILayout.LabelField(I18Ns.AutoCreateEventSystem, GUILayout.MaxWidth(200));
                         m_Config.AutoCreateEventSystem = EditorGUILayout.Toggle(m_Config.AutoCreateEventSystem, GUILayout.MaxWidth(180));
                         EditorGUILayout.EndHorizontal();
+
+                        if (m_Config.AutoCreateEventSystem)
+                        {
+                            EditorGUILayout.BeginHorizontal();
+                            EditorGUILayout.LabelField(I18Ns.DontDestroyEventSystem, GUILayout.MaxWidth(200));
+                            EditorGUILayout.PropertyField(m_Config_SerObj.FindProperty("DontDestroyEventSystem"), GUIContent.none);
+                            EditorGUILayout.EndHorizontal();
+                        }
 #endif
 
                         //Default Mask Color
@@ -415,6 +418,15 @@ namespace TinaXEditor.UIKit.Internal
                     if (NihongoDesuka)
                         return "EventSystemを自動的に作成する";
                     return "Auto Create EventSystem";
+                }
+            }
+            public static string DontDestroyEventSystem
+            {
+                get
+                {
+                    if (IsChinese)
+                        return "Dont Destroy EventSystem";
+                    return "Dont Destroy EventSystem";
                 }
             }
 
